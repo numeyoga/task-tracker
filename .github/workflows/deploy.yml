@@ -1,0 +1,202 @@
+name: Build and Deploy to GitHub Pages
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ['main', 'master']
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+  security-events: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: 'pages'
+  cancel-in-progress: false
+
+jobs:
+  # Security and Quality Checks
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Run npm audit to check for security vulnerabilities
+      - name: Run security audit
+        run: npm audit --audit-level high
+
+      # Check for outdated dependencies
+      - name: Check for outdated packages
+        run: npm outdated || true
+
+      # Run ESLint for code quality
+      - name: Run ESLint
+        run: npm run lint
+        continue-on-error: false
+
+      # Upload audit results
+      - name: Upload audit results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-audit
+          path: |
+            npm-audit.json
+            eslint-report.json
+          retention-days: 30
+
+  # Build and Test
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    needs: security-audit
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Run tests if available
+      - name: Run tests
+        run: npm test
+        continue-on-error: false
+
+      # Build the application
+      - name: Build application
+        run: npm run build
+        env:
+          # Set base path for GitHub Pages (will be /task-tracker/ or your repo name)
+          VITE_BASE_PATH: ${{ github.event.repository.name }}
+
+      # Check build output
+      - name: Verify build output
+        run: |
+          echo "Build completed successfully!"
+          echo "Checking dist directory:"
+          ls -la dist/
+          echo "Checking bundle size:"
+          du -sh dist/*
+
+      # Upload build artifacts for deployment
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: dist/
+          retention-days: 1
+
+      # Upload Pages artifact
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/
+
+  # Bundle Analysis (Optional)
+  analyze-bundle:
+    name: Bundle Analysis
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Run bundle analyzer if available
+      - name: Analyze bundle
+        run: npm run build:analyze || echo "Bundle analysis not configured"
+        continue-on-error: true
+
+  # Deploy to GitHub Pages
+  deploy:
+    name: Deploy to GitHub Pages
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: [build-and-test, analyze-bundle]
+    if: always() && needs.build-and-test.result == 'success'
+    steps:
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      # Post-deployment verification
+      - name: Verify deployment
+        run: |
+          echo "Deployment completed!"
+          echo "Site URL: ${{ steps.deployment.outputs.page_url }}"
+
+          # Wait a moment for deployment to be ready
+          sleep 10
+
+          # Check if site is accessible (basic health check)
+          if curl -f -s "${{ steps.deployment.outputs.page_url }}" > /dev/null; then
+            echo "✅ Site is accessible and responding"
+          else
+            echo "⚠️ Site may still be deploying or there's an issue"
+          fi
+
+  # Notify on success/failure (optional)
+  notify:
+    name: Notify Results
+    runs-on: ubuntu-latest
+    needs: [security-audit, build-and-test, deploy]
+    if: always()
+    steps:
+      - name: Summary
+        run: |
+          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Audit | ${{ needs.security-audit.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build and Test | ${{ needs.build-and-test.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Deploy | ${{ needs.deploy.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ needs.deploy.result }}" = "success" ]; then
+            echo "🎉 **Deployment successful!**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Your Work Time Tracker is now live and accessible." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Deployment failed**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Please check the logs above for details." >> $GITHUB_STEP_SUMMARY
+          fi
