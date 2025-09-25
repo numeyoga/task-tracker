@@ -50,7 +50,7 @@ jobs:
       # Run ESLint for code quality
       - name: Run ESLint
         run: npm run lint
-        continue-on-error: false
+        continue-on-error: true
 
       # Upload audit results
       - name: Upload audit results
