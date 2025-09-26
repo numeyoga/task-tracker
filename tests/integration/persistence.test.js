@@ -43,7 +43,7 @@ describe('Integration Test: Data Persistence', () => {
     unmount();
 
     // Step 3: Reopen application URL (render again)
-    const { container } = render(App);
+    render(App);
 
     // Step 4: Verify all data is restored
     await waitFor(() => {

@@ -15,7 +15,6 @@
   };
   let errors = {};
   let isSubmitting = false;
-  let modalRef;
 
   // Available colors for tasks
   const availableColors = [
@@ -92,7 +91,6 @@
 
   // Auto-focus name input when modal opens
   function handleModalOpen(node) {
-    modalRef = node;
     const nameInput = node.querySelector('input[name="name"]');
     if (nameInput) {
       setTimeout(() => nameInput.focus(), 100);

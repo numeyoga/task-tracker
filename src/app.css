@@ -5,11 +5,16 @@
 /* Application-specific styles */
 body {
   font-family:
+    'Inter',
     system-ui,
     -apple-system,
+    'Segoe UI',
+    'Roboto',
     sans-serif;
   margin: 0;
   min-height: 100vh;
+  font-feature-settings: 'cv11', 'ss01';
+  font-variant-numeric: tabular-nums;
 }
 
 /* DaisyUI Bumblebee theme customizations */
@@ -17,6 +22,295 @@ body {
   color-scheme: light;
 }
 
+[data-theme="bumblebee"] {
+  /* Enhanced Bumblebee theme colors */
+  --rounded-box: 0.75rem;
+  --rounded-btn: 0.5rem;
+  --rounded-badge: 1.9rem;
+  --animation-btn: 0.25s;
+  --animation-input: 0.2s;
+  --btn-text-case: uppercase;
+  --btn-focus-scale: 0.95;
+  --border-btn: 1px;
+  --tab-border: 1px;
+  --tab-radius: 0.5rem;
+}
+
 #app {
   min-height: 100vh;
+  background: hsl(var(--b2));
+}
+
+/* Desktop-optimized components */
+@layer components {
+  /* Enhanced buttons for desktop */
+  .btn {
+    @apply transition-all duration-200;
+    @apply hover:scale-105 active:scale-95;
+    @apply shadow-sm hover:shadow-md;
+    transition-timing-function: ease-in-out;
+  }
+
+  .btn-primary {
+    @apply bg-gradient-to-r from-yellow-400 to-yellow-500;
+    @apply hover:from-yellow-500 hover:to-yellow-600;
+    @apply text-yellow-900 font-semibold;
+  }
+
+  /* Enhanced cards and containers */
+  .card {
+    @apply shadow-lg hover:shadow-xl transition-shadow duration-300;
+    @apply border;
+  }
+
+  /* Enhanced input fields */
+  .input {
+    @apply transition-all duration-200;
+    @apply border-2;
+    @apply focus:shadow-lg;
+  }
+
+  /* Desktop-specific navigation */
+  .drawer-side {
+    @apply shadow-xl;
+  }
+
+  .menu li > *:focus,
+  .menu li > *.active,
+  .menu li > *:active {
+    @apply bg-primary text-primary-content;
+    @apply shadow-lg transform scale-105;
+  }
+
+  /* Enhanced timer display */
+  .timer-display {
+    @apply font-mono text-6xl font-bold;
+    @apply bg-gradient-to-br from-primary to-primary-focus;
+    @apply bg-clip-text text-transparent;
+    @apply drop-shadow-lg;
+  }
+
+  /* Task list enhancements */
+  .task-item {
+    @apply transition-all duration-200;
+    @apply hover:bg-base-200 hover:shadow-md;
+    @apply border-l-4 border-transparent;
+    @apply hover:border-primary;
+  }
+
+  .task-item.active {
+    @apply bg-primary/10 border-primary shadow-md;
+  }
+
+  /* Alert and notification enhancements */
+  .alert {
+    @apply shadow-lg border;
+    @apply backdrop-blur-sm;
+  }
+
+  .alert-success {
+    @apply bg-success/90 border-success/50;
+  }
+
+  .alert-error {
+    @apply bg-error/90 border-error/50;
+  }
+
+  .alert-warning {
+    @apply bg-warning/90 border-warning/50;
+  }
+
+  .alert-info {
+    @apply bg-info/90 border-info/50;
+  }
+
+  /* Progress and loading indicators */
+  .loading {
+    @apply text-primary;
+  }
+
+  .progress {
+    @apply bg-base-300;
+  }
+
+  .progress-primary {
+    @apply bg-gradient-to-r from-primary to-primary-focus;
+  }
+
+  /* Modal enhancements */
+  .modal-box {
+    @apply shadow-2xl border border-base-300;
+    @apply bg-gradient-to-br from-base-100 to-base-200;
+  }
+
+  /* Table enhancements */
+  .table {
+    @apply shadow-lg rounded-lg overflow-hidden;
+  }
+
+  .table th {
+    @apply bg-base-200 text-base-content font-semibold;
+    @apply border-b-2 border-base-300;
+  }
+
+  .table tr:hover {
+    @apply bg-base-200/50;
+  }
+
+  /* Form control enhancements */
+  .form-control label {
+    @apply font-medium text-base-content/80;
+  }
+
+  /* Stats and metrics */
+  .stat {
+    @apply bg-gradient-to-br from-base-100 to-base-200;
+    @apply border border-base-300/50;
+    @apply shadow-md;
+  }
+
+  .stat-value {
+    @apply text-primary font-bold;
+  }
+
+  /* Keyboard shortcut styling */
+  .kbd {
+    @apply bg-base-200 border-2 border-base-300;
+    @apply shadow-inner font-mono font-medium;
+    @apply text-base-content/80;
+  }
+}
+
+/* Smooth scrolling and animations */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Focus styles for accessibility */
+*:focus-visible {
+  @apply outline-2 outline-primary outline-offset-2;
+  @apply ring-2 ring-primary/50 ring-offset-2 ring-offset-base-100;
+}
+
+/* Selection styling */
+::selection {
+  @apply bg-primary/20 text-primary-content;
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-base-200 rounded-lg;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-base-content/20 rounded-lg;
+  @apply hover:bg-base-content/40;
+}
+
+::-webkit-scrollbar-thumb:active {
+  @apply bg-base-content/60;
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--bc) / 0.2) hsl(var(--b2));
+}
+
+/* Loading and transition animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% {
+    animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    transform: translate3d(0, 0, 0);
+  }
+  40%, 43% {
+    animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+    transform: translate3d(0, -6px, 0);
+  }
+  70% {
+    animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+    transform: translate3d(0, -3px, 0);
+  }
+  90% {
+    transform: translate3d(0, -1px, 0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.slide-in-right {
+  animation: slideInRight 0.3s ease-out forwards;
+}
+
+.animate-pulse-custom {
+  animation: pulse 2s infinite;
+}
+
+.animate-bounce-custom {
+  animation: bounce 1s infinite;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .btn, .card, .input, .modal-box {
+    @apply border-2 border-base-content/30;
+  }
+
+  .btn:hover, .btn:focus {
+    @apply border-base-content/60;
+  }
 }

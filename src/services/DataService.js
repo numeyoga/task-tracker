@@ -3,12 +3,13 @@
  * Service for managing localStorage operations and data persistence
  */
 
-import { Task } from '../models/Task.js';
-import { TimeEntry } from '../models/TimeEntry.js';
-import { WorkDay } from '../models/WorkDay.js';
-import { MealBreak } from '../models/MealBreak.js';
-import { ActivityCounter } from '../models/ActivityCounter.js';
-import { Settings } from '../models/Settings.js';
+// Models are imported for validation but may not be used directly
+// import { Task } from '../models/Task.js';
+// import { TimeEntry } from '../models/TimeEntry.js';
+// import { WorkDay } from '../models/WorkDay.js';
+// import { MealBreak } from '../models/MealBreak.js';
+// import { ActivityCounter } from '../models/ActivityCounter.js';
+// import { Settings } from '../models/Settings.js';
 
 const STORAGE_KEY = 'task-tracker-data';
 const CURRENT_VERSION = '1.0.0';
@@ -19,6 +20,7 @@ export class DataService {
     this.autoSaveInterval = null;
     this.autoSaveTimer = null;
     this.pendingData = null;
+    this.cleanupInterval = null;
     this.initializeStorage();
   }
 
@@ -384,10 +386,211 @@ export class DataService {
   }
 
   /**
+   * Clean up old data based on retention settings
+   * @param {number} retentionWeeks - Number of weeks to retain data (default: 5)
+   * @returns {Promise<Object>} - Cleanup statistics
+   */
+  async cleanupOldData(retentionWeeks = 5) {
+    try {
+      const data = this.loadData();
+      if (!data) {
+        return { deleted: 0, retained: 0, message: 'No data to clean up' };
+      }
+
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - (retentionWeeks * 7));
+
+      let deletedCount = 0;
+      let retainedCount = 0;
+
+      // Clean up time entries
+      if (data.timeEntries && Array.isArray(data.timeEntries)) {
+        data.timeEntries = data.timeEntries.filter((entry) => {
+          const entryDate = new Date(entry.date || entry.startTime);
+          if (entryDate < cutoffDate) {
+            deletedCount++;
+            return false;
+          }
+          retainedCount++;
+          return true;
+        });
+      }
+
+      // Clean up work days
+      if (data.workDays && Array.isArray(data.workDays)) {
+        data.workDays = data.workDays.filter((workDay) => {
+          const workDate = new Date(workDay.date);
+          if (workDate < cutoffDate) {
+            deletedCount++;
+            return false;
+          }
+          retainedCount++;
+          return true;
+        });
+      }
+
+      // Clean up meal breaks
+      if (data.mealBreaks && Array.isArray(data.mealBreaks)) {
+        data.mealBreaks = data.mealBreaks.filter((mealBreak) => {
+          const mealDate = new Date(mealBreak.date || mealBreak.startTime);
+          if (mealDate < cutoffDate) {
+            deletedCount++;
+            return false;
+          }
+          retainedCount++;
+          return true;
+        });
+      }
+
+      // Clean up activity counters
+      if (data.activityCounters && Array.isArray(data.activityCounters)) {
+        data.activityCounters = data.activityCounters.filter((counter) => {
+          const counterDate = new Date(counter.date);
+          if (counterDate < cutoffDate) {
+            deletedCount++;
+            return false;
+          }
+          retainedCount++;
+          return true;
+        });
+      }
+
+      // Save cleaned data
+      if (deletedCount > 0) {
+        await this.saveData(data);
+        this.emit('dataCleanupCompleted', {
+          deleted: deletedCount,
+          retained: retainedCount,
+          cutoffDate: cutoffDate.toISOString(),
+          retentionWeeks
+        });
+      }
+
+      return {
+        deleted: deletedCount,
+        retained: retainedCount,
+        cutoffDate: cutoffDate.toISOString(),
+        message: deletedCount > 0
+          ? `Cleaned up ${deletedCount} old records, retained ${retainedCount} recent records`
+          : 'No old data found to clean up'
+      };
+    } catch (error) {
+      this.emit('storageError', error);
+      throw new Error(`Failed to clean up old data: ${error.message}`);
+    }
+  }
+
+  /**
+   * Schedule automatic data cleanup
+   * @param {number} retentionWeeks - Number of weeks to retain data
+   * @param {number} intervalHours - How often to run cleanup (in hours, default: 24)
+   */
+  startAutoCleanup(retentionWeeks = 5, intervalHours = 24) {
+    // Stop any existing cleanup
+    this.stopAutoCleanup();
+
+    const intervalMs = intervalHours * 60 * 60 * 1000; // Convert hours to milliseconds
+
+    this.cleanupInterval = setInterval(async () => {
+      try {
+        console.log('Running scheduled data cleanup...');
+        const result = await this.cleanupOldData(retentionWeeks);
+        console.log('Auto cleanup completed:', result.message);
+
+        this.emit('autoCleanupCompleted', result);
+      } catch (error) {
+        console.error('Auto cleanup failed:', error);
+        this.emit('autoCleanupError', error);
+      }
+    }, intervalMs);
+
+    console.log(`Auto cleanup scheduled every ${intervalHours} hours with ${retentionWeeks} weeks retention`);
+
+    // Run initial cleanup
+    this.cleanupOldData(retentionWeeks).catch((error) => {
+      console.error('Initial cleanup failed:', error);
+    });
+  }
+
+  /**
+   * Stop automatic data cleanup
+   */
+  stopAutoCleanup() {
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+      this.cleanupInterval = null;
+      console.log('Auto cleanup stopped');
+    }
+  }
+
+  /**
+   * Get data usage statistics by age
+   * @param {number} retentionWeeks - Retention period to analyze
+   * @returns {Object} - Usage statistics
+   */
+  getDataAgeStats(retentionWeeks = 5) {
+    try {
+      const data = this.loadData();
+      if (!data) {
+        return { total: 0, withinRetention: 0, beyondRetention: 0 };
+      }
+
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - (retentionWeeks * 7));
+
+      let total = 0;
+      let withinRetention = 0;
+      let beyondRetention = 0;
+
+      // Count time entries
+      if (data.timeEntries && Array.isArray(data.timeEntries)) {
+        data.timeEntries.forEach((entry) => {
+          total++;
+          const entryDate = new Date(entry.date || entry.startTime);
+          if (entryDate >= cutoffDate) {
+            withinRetention++;
+          } else {
+            beyondRetention++;
+          }
+        });
+      }
+
+      // Count other data types
+      const dataTypes = ['workDays', 'mealBreaks', 'activityCounters'];
+      dataTypes.forEach((type) => {
+        if (data[type] && Array.isArray(data[type])) {
+          data[type].forEach((item) => {
+            total++;
+            const itemDate = new Date(item.date || item.startTime);
+            if (itemDate >= cutoffDate) {
+              withinRetention++;
+            } else {
+              beyondRetention++;
+            }
+          });
+        }
+      });
+
+      return {
+        total,
+        withinRetention,
+        beyondRetention,
+        retentionWeeks,
+        cutoffDate: cutoffDate.toISOString(),
+        needsCleanup: beyondRetention > 0
+      };
+    } catch (error) {
+      this.emit('storageError', error);
+      return { total: 0, withinRetention: 0, beyondRetention: 0, error: error.message };
+    }
+  }
+
+  /**
    * Destroy service and clean up
    */
   destroy() {
     this.stopAutoSave();
+    this.stopAutoCleanup();
     this.eventListeners.clear();
   }
 }

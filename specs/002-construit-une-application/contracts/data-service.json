@@ -1,0 +1,54 @@
+{
+  "name": "DataService",
+  "description": "Service for managing localStorage operations and data persistence",
+  "methods": {
+    "saveData": {
+      "description": "Save all application data to localStorage",
+      "parameters": {
+        "data": "AppData - Complete application state"
+      },
+      "returns": "Promise<boolean> - Success status",
+      "throws": ["StorageQuotaExceededError", "SecurityError"]
+    },
+    "loadData": {
+      "description": "Load application data from localStorage",
+      "parameters": {},
+      "returns": "AppData | null - Application state or null if not found",
+      "throws": ["SecurityError", "SyntaxError"]
+    },
+    "clearData": {
+      "description": "Clear all application data from localStorage",
+      "parameters": {},
+      "returns": "Promise<boolean> - Success status",
+      "throws": ["SecurityError"]
+    },
+    "exportData": {
+      "description": "Export data as JSON for backup",
+      "parameters": {},
+      "returns": "string - JSON representation of all data",
+      "throws": ["SecurityError"]
+    },
+    "importData": {
+      "description": "Import data from JSON backup",
+      "parameters": {
+        "jsonData": "string - JSON data to import"
+      },
+      "returns": "Promise<boolean> - Success status",
+      "throws": ["ValidationError", "SyntaxError"]
+    }
+  },
+  "events": {
+    "dataLoaded": {
+      "description": "Emitted when data is loaded from storage",
+      "payload": "AppData"
+    },
+    "dataSaved": {
+      "description": "Emitted when data is saved to storage",
+      "payload": "{ timestamp: Date, size: number }"
+    },
+    "storageError": {
+      "description": "Emitted when storage operation fails",
+      "payload": "Error"
+    }
+  }
+}

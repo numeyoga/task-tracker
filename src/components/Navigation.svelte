@@ -1,6 +1,6 @@
 <script>
   import { navigationItems, viewActions, currentViewInfo } from '../stores/view.js';
-  import { timerState, timerStatus } from '../stores/timer.js';
+  import { timerStatus } from '../stores/timer.js';
 
   // Icons (using simple SVG icons to avoid external dependencies)
   const icons = {

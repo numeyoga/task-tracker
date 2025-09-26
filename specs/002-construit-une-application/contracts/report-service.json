@@ -1,0 +1,63 @@
+{
+  "name": "ReportService",
+  "description": "Service for generating reports and analytics",
+  "methods": {
+    "getDailyReport": {
+      "description": "Generate daily work report",
+      "parameters": {
+        "date": "string - ISO date string (YYYY-MM-DD)"
+      },
+      "returns": "DailyReport - Daily statistics and breakdown",
+      "throws": ["InvalidDateError"]
+    },
+    "getWeeklyReport": {
+      "description": "Generate weekly work report (Monday-Friday)",
+      "parameters": {
+        "weekStart": "string - Monday date (YYYY-MM-DD)"
+      },
+      "returns": "WeeklyReport - Weekly statistics and task breakdown",
+      "throws": ["InvalidDateError"]
+    },
+    "getAvailableWeeks": {
+      "description": "Get list of weeks with data for dropdown selection",
+      "parameters": {},
+      "returns": "WeekOption[] - Array of week options",
+      "throws": []
+    },
+    "getAuditData": {
+      "description": "Get all historical data for audit view",
+      "parameters": {
+        "dateRange": "{ start: Date, end: Date } - Optional date range filter"
+      },
+      "returns": "AuditData - Complete historical data",
+      "throws": ["InvalidDateRangeError"]
+    },
+    "calculatePresenceTime": {
+      "description": "Calculate presence time for specific date",
+      "parameters": {
+        "date": "string - ISO date string"
+      },
+      "returns": "PresenceCalculation - Presence time breakdown",
+      "throws": ["InvalidDateError"]
+    },
+    "exportWeeklyData": {
+      "description": "Export weekly data in format for external systems",
+      "parameters": {
+        "weekStart": "string - Monday date (YYYY-MM-DD)",
+        "format": "string - Export format (json|csv|text)"
+      },
+      "returns": "string - Formatted export data",
+      "throws": ["InvalidDateError", "UnsupportedFormatError"]
+    }
+  },
+  "events": {
+    "reportGenerated": {
+      "description": "Emitted when report is generated",
+      "payload": "{ type: string, date: string, duration: number }"
+    },
+    "dataExported": {
+      "description": "Emitted when data is exported",
+      "payload": "{ format: string, size: number }"
+    }
+  }
+}

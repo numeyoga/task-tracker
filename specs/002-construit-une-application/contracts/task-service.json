@@ -1,0 +1,79 @@
+{
+  "name": "TaskService",
+  "description": "Service for managing work tasks and task operations",
+  "methods": {
+    "createTask": {
+      "description": "Create new work task",
+      "parameters": {
+        "name": "string - Task name (1-100 characters)",
+        "color": "string - DaisyUI color class"
+      },
+      "returns": "Promise<Task> - Created task",
+      "throws": ["ValidationError", "DuplicateTaskNameError"]
+    },
+    "updateTask": {
+      "description": "Update existing task",
+      "parameters": {
+        "taskId": "string - Task identifier",
+        "updates": "Partial<Task> - Fields to update"
+      },
+      "returns": "Promise<Task> - Updated task",
+      "throws": ["TaskNotFoundError", "ValidationError"]
+    },
+    "deleteTask": {
+      "description": "Delete task (soft delete with archiving)",
+      "parameters": {
+        "taskId": "string - Task identifier"
+      },
+      "returns": "Promise<boolean> - Success status",
+      "throws": ["TaskNotFoundError", "ActiveTaskDeleteError"]
+    },
+    "getAllTasks": {
+      "description": "Get all active tasks",
+      "parameters": {},
+      "returns": "Task[] - Array of active tasks",
+      "throws": []
+    },
+    "getActiveTask": {
+      "description": "Get currently active task",
+      "parameters": {},
+      "returns": "Task | null - Active task or null",
+      "throws": []
+    },
+    "setActiveTask": {
+      "description": "Set specified task as active",
+      "parameters": {
+        "taskId": "string - Task identifier"
+      },
+      "returns": "Promise<Task> - Activated task",
+      "throws": ["TaskNotFoundError"]
+    },
+    "getTaskStats": {
+      "description": "Get time statistics for specific task",
+      "parameters": {
+        "taskId": "string - Task identifier",
+        "dateRange": "{ start: Date, end: Date } - Date range for stats"
+      },
+      "returns": "TaskStats - Statistics object",
+      "throws": ["TaskNotFoundError"]
+    }
+  },
+  "events": {
+    "taskCreated": {
+      "description": "Emitted when new task is created",
+      "payload": "Task"
+    },
+    "taskUpdated": {
+      "description": "Emitted when task is updated",
+      "payload": "{ task: Task, changes: string[] }"
+    },
+    "taskDeleted": {
+      "description": "Emitted when task is deleted",
+      "payload": "{ taskId: string, name: string }"
+    },
+    "taskActivated": {
+      "description": "Emitted when task becomes active",
+      "payload": "Task"
+    }
+  }
+}

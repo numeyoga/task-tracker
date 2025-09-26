@@ -49,19 +49,6 @@
     dispatch('createTask');
   }
 
-  function getTaskColorClass(color) {
-    const colorMap = {
-      primary: 'text-primary',
-      secondary: 'text-secondary',
-      accent: 'text-accent',
-      success: 'text-success',
-      warning: 'text-warning',
-      error: 'text-error',
-      info: 'text-info',
-      neutral: 'text-neutral'
-    };
-    return colorMap[color] || colorMap.primary;
-  }
 
   function getTaskIndicatorClass(color) {
     const colorMap = {

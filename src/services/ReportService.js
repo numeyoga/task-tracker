@@ -3,9 +3,10 @@
  * Service for generating reports and analytics
  */
 
-import { WorkDay } from '../models/WorkDay.js';
-import { TimeEntry } from '../models/TimeEntry.js';
-import { MealBreak } from '../models/MealBreak.js';
+// Models imported for type checking but not used directly
+// import { WorkDay } from '../models/WorkDay.js';
+// import { TimeEntry } from '../models/TimeEntry.js';
+// import { MealBreak } from '../models/MealBreak.js';
 
 export class ReportService {
   constructor(dataService = null) {
@@ -105,7 +106,7 @@ export class ReportService {
     const startTime = performance.now();
 
     try {
-      const data = this.loadData();
+      this.loadData();
       const weekDates = this.getWeekDates(weekStart);
       const dailyReports = [];
 
@@ -114,7 +115,7 @@ export class ReportService {
         try {
           const dailyReport = await this.getDailyReport(date);
           dailyReports.push(dailyReport);
-        } catch (error) {
+        } catch {
           // If daily report fails, create empty report for that day
           dailyReports.push(this.createEmptyDailyReport(date));
         }

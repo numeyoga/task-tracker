@@ -1,6 +1,6 @@
 <script>
   import { timerState, mealBreakState, timerActions } from '../../stores/timer.js';
-  import { allTasks, activeTask, taskActions } from '../../stores/tasks.js';
+  import { allTasks, activeTask } from '../../stores/tasks.js';
 
   // Timer display components would go here - for now using inline implementation
   let selectedTaskId = null;

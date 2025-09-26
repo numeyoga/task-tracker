@@ -1,5 +1,5 @@
 <script>
-  import { selectedDate, dailyReport, reportActions } from '../../stores/reports.js';
+  import { selectedDate, dailyReport } from '../../stores/reports.js';
 
   // Initialize with today's date
   $: if (!$selectedDate) {

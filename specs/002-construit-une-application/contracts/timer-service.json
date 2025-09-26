@@ -1,0 +1,82 @@
+{
+  "name": "TimerService",
+  "description": "Service for managing task timers and time calculations",
+  "methods": {
+    "startTimer": {
+      "description": "Start timing for specified task",
+      "parameters": {
+        "taskId": "string - Task identifier"
+      },
+      "returns": "Promise<TimeEntry> - Created time entry",
+      "throws": ["TaskNotFoundError", "TimerAlreadyActiveError"]
+    },
+    "stopTimer": {
+      "description": "Stop the currently active timer",
+      "parameters": {},
+      "returns": "Promise<TimeEntry> - Completed time entry",
+      "throws": ["NoActiveTimerError"]
+    },
+    "getCurrentTimer": {
+      "description": "Get current timer status and elapsed time",
+      "parameters": {},
+      "returns": "TimerStatus | null - Current timer info or null",
+      "throws": []
+    },
+    "switchTask": {
+      "description": "Switch active timer to different task",
+      "parameters": {
+        "newTaskId": "string - New task identifier"
+      },
+      "returns": "Promise<{ stopped: TimeEntry, started: TimeEntry }>",
+      "throws": ["TaskNotFoundError"]
+    },
+    "adjustTime": {
+      "description": "Manually adjust time for specific time entry",
+      "parameters": {
+        "entryId": "string - Time entry identifier",
+        "newDuration": "number - New duration in milliseconds",
+        "note": "string - Reason for adjustment"
+      },
+      "returns": "Promise<TimeEntry> - Updated time entry",
+      "throws": ["TimeEntryNotFoundError", "InvalidDurationError"]
+    },
+    "startMealBreak": {
+      "description": "Start meal break timer",
+      "parameters": {},
+      "returns": "Promise<MealBreak> - Created meal break",
+      "throws": ["MealBreakAlreadyActiveError"]
+    },
+    "stopMealBreak": {
+      "description": "Stop meal break timer",
+      "parameters": {},
+      "returns": "Promise<MealBreak> - Completed meal break",
+      "throws": ["NoActiveMealBreakError"]
+    }
+  },
+  "events": {
+    "timerStarted": {
+      "description": "Emitted when task timer starts",
+      "payload": "{ taskId: string, timeEntry: TimeEntry }"
+    },
+    "timerStopped": {
+      "description": "Emitted when task timer stops",
+      "payload": "{ taskId: string, timeEntry: TimeEntry }"
+    },
+    "timerTick": {
+      "description": "Emitted every second while timer is running",
+      "payload": "{ taskId: string, elapsed: number }"
+    },
+    "timerAutoStopped": {
+      "description": "Emitted when timer auto-stops due to maximum duration",
+      "payload": "{ taskId: string, timeEntry: TimeEntry, reason: string }"
+    },
+    "mealBreakStarted": {
+      "description": "Emitted when meal break starts",
+      "payload": "MealBreak"
+    },
+    "mealBreakStopped": {
+      "description": "Emitted when meal break stops",
+      "payload": "MealBreak"
+    }
+  }
+}

@@ -1,6 +1,6 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-  import { allTasks, activeTask, sortedTasks, taskActions, taskUtils } from '../../stores/tasks.js';
+  import { activeTask, sortedTasks, taskActions, taskUtils } from '../../stores/tasks.js';
   import { timerState } from '../../stores/timer.js';
 
   const dispatch = createEventDispatcher();

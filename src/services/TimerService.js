@@ -383,7 +383,7 @@ export class TimerService {
    * Auto-stop meal break
    * @param {string} reason - Reason for auto-stop
    */
-  async autoStopMealBreak(reason) {
+  async autoStopMealBreak() {
     if (!this.activeMealBreak) return;
 
     await this.stopMealBreak();

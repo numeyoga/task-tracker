@@ -72,7 +72,6 @@ describe('Integration Test: Meal Break Tracking', () => {
 
     // Step 6: Verify meal time is deducted from presence time
     // Step 7: Check daily summary shows correct working time
-    const dailySummary = screen.getByTestId('daily-summary');
     const presenceTime = screen.getByTestId('presence-time');
     const workTime = screen.getByTestId('work-time');
     const mealTime = screen.getByTestId('meal-time');

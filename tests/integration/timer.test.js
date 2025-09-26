@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { render, fireEvent, screen, waitFor } from '@testing-library/svelte';
+import { render, fireEvent, screen, waitFor, within } from '@testing-library/svelte';
 import App from '../../src/App.svelte';
 
 describe('Integration Test: Basic Timer Operations', () => {
@@ -191,7 +191,6 @@ describe('Integration Test: Basic Timer Operations', () => {
     render(App);
 
     const startButton = screen.getByRole('button', { name: /start/i });
-    const timerDisplay = screen.getByTestId('timer-display');
 
     // Rapid start/stop operations
     await fireEvent.click(startButton);

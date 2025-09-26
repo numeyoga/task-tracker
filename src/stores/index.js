@@ -3,6 +3,8 @@
  * Central export point for all Svelte stores and store subscriptions
  */
 
+import { derived } from 'svelte/store';
+
 // Import all stores
 import {
   timerState,
@@ -342,7 +344,7 @@ export const storeUtils = {
   /**
    * Subscribe to multiple stores with cleanup
    */
-  subscribeToMultiple(storeSubscriptions, callback) {
+  subscribeToMultiple(storeSubscriptions) {
     const unsubscribers = storeSubscriptions.map(({ store, handler }) => {
       return store.subscribe(handler);
     });

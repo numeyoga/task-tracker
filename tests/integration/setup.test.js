@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, fireEvent, screen, waitFor } from '@testing-library/svelte';
 import App from '../../src/App.svelte';
 
@@ -94,7 +94,12 @@ describe('Integration Test: First-Time User Setup', () => {
     });
 
     // 3. Default presence time is configurable
-    expect(parsedData.settings.dailyHours).toBe(7.5); // User modified value
+    await waitFor(() => {
+      const savedData = localStorage.getItem('task-tracker-data');
+      expect(savedData).toBeTruthy();
+      const parsedData = JSON.parse(savedData);
+      expect(parsedData.settings.dailyHours).toBe(7.5); // User modified value
+    });
 
     // 4. Task creation works with validation
     const invalidTaskInput = screen.getByLabelText(/task.*name/i);
@@ -155,8 +160,6 @@ describe('Integration Test: First-Time User Setup', () => {
     render(App);
 
     await waitFor(() => {
-      const body = document.body;
-      const computedStyle = window.getComputedStyle(body);
 
       // Verify Bumblebee theme colors are applied
       // Bumblebee theme uses yellow/amber colors
