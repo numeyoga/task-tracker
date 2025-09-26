@@ -301,7 +301,6 @@ export class TaskService {
       // Calculate statistics
       const totalDuration = timeEntries.reduce((sum, entry) => sum + (entry.duration || 0), 0);
       const sessionCount = timeEntries.length;
-      const averageSession = sessionCount > 0 ? totalDuration / sessionCount : 0;
 
       // Group by date for daily breakdown
       const dailyBreakdown = this.groupEntriesByDate(timeEntries);

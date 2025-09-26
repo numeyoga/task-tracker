@@ -257,74 +257,70 @@ export class ReportService {
    * @returns {Object} - Complete historical data
    */
   async getAuditData(dateRange = null) {
-    try {
-      const data = this.loadData();
+    const data = this.loadData();
 
-      let timeEntries = data?.timeEntries || [];
-      let mealBreaks = data?.mealBreaks || [];
-      let workDays = data?.workDays || [];
-      let tasks = data?.tasks || [];
+    let timeEntries = data?.timeEntries || [];
+    let mealBreaks = data?.mealBreaks || [];
+    let workDays = data?.workDays || [];
+    let tasks = data?.tasks || [];
 
-      // Apply date range filter if provided
-      if (dateRange && dateRange.start && dateRange.end) {
-        if (!this.isValidDateRange(dateRange)) {
-          throw new InvalidDateRangeError('Invalid date range provided');
-        }
-
-        const startDate = new Date(dateRange.start);
-        const endDate = new Date(dateRange.end);
-
-        timeEntries = timeEntries.filter((entry) => {
-          const entryDate = new Date(entry.date || entry.startTime);
-          return entryDate >= startDate && entryDate <= endDate;
-        });
-
-        mealBreaks = mealBreaks.filter((mb) => {
-          const mbDate = new Date(mb.date || mb.startTime);
-          return mbDate >= startDate && mbDate <= endDate;
-        });
-
-        workDays = workDays.filter((wd) => {
-          const wdDate = new Date(wd.date);
-          return wdDate >= startDate && wdDate <= endDate;
-        });
+    // Apply date range filter if provided
+    if (dateRange && dateRange.start && dateRange.end) {
+      if (!this.isValidDateRange(dateRange)) {
+        throw new InvalidDateRangeError('Invalid date range provided');
       }
 
-      // Enrich time entries with task names
-      const enrichedTimeEntries = timeEntries.map((entry) => {
-        const task = tasks.find((t) => t.id === entry.taskId);
-        return {
-          ...entry,
-          taskName: task?.name || 'Unknown Task',
-          taskColor: task?.color || 'primary'
-        };
+      const startDate = new Date(dateRange.start);
+      const endDate = new Date(dateRange.end);
+
+      timeEntries = timeEntries.filter((entry) => {
+        const entryDate = new Date(entry.date || entry.startTime);
+        return entryDate >= startDate && entryDate <= endDate;
       });
 
-      // Sort by date descending
-      enrichedTimeEntries.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
-      mealBreaks.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
-      workDays.sort((a, b) => new Date(b.date) - new Date(a.date));
+      mealBreaks = mealBreaks.filter((mb) => {
+        const mbDate = new Date(mb.date || mb.startTime);
+        return mbDate >= startDate && mbDate <= endDate;
+      });
 
-      return {
-        entries: enrichedTimeEntries,
-        timeEntries: enrichedTimeEntries,
-        mealBreaks,
-        workDays,
-        tasks,
-        dateRange,
-        totalEntries: enrichedTimeEntries.length,
-        totalMealBreaks: mealBreaks.length,
-        totalWorkDays: workDays.length,
-        summary: {
-          totalTime: enrichedTimeEntries.reduce((sum, entry) => sum + (entry.duration || 0), 0),
-          totalSessions: enrichedTimeEntries.length,
-          uniqueTasks: new Set(enrichedTimeEntries.map(e => e.taskId)).size,
-          dateRange: dateRange
-        }
-      };
-    } catch (error) {
-      throw error;
+      workDays = workDays.filter((wd) => {
+        const wdDate = new Date(wd.date);
+        return wdDate >= startDate && wdDate <= endDate;
+      });
     }
+
+    // Enrich time entries with task names
+    const enrichedTimeEntries = timeEntries.map((entry) => {
+      const task = tasks.find((t) => t.id === entry.taskId);
+      return {
+        ...entry,
+        taskName: task?.name || 'Unknown Task',
+        taskColor: task?.color || 'primary'
+      };
+    });
+
+    // Sort by date descending
+    enrichedTimeEntries.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+    mealBreaks.sort((a, b) => new Date(b.startTime) - new Date(a.startTime));
+    workDays.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    return {
+      entries: enrichedTimeEntries,
+      timeEntries: enrichedTimeEntries,
+      mealBreaks,
+      workDays,
+      tasks,
+      dateRange,
+      totalEntries: enrichedTimeEntries.length,
+      totalMealBreaks: mealBreaks.length,
+      totalWorkDays: workDays.length,
+      summary: {
+        totalTime: enrichedTimeEntries.reduce((sum, entry) => sum + (entry.duration || 0), 0),
+        totalSessions: enrichedTimeEntries.length,
+        uniqueTasks: new Set(enrichedTimeEntries.map(e => e.taskId)).size,
+        dateRange: dateRange
+      }
+    };
   }
 
   /**

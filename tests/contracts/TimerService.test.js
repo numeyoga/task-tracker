@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi, waitFor } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { TimerService, TaskNotFoundError, TimerAlreadyActiveError, NoActiveTimerError, TimeEntryNotFoundError, InvalidDurationError, MealBreakAlreadyActiveError, NoActiveMealBreakError } from '../../src/services/TimerService.js';
 import { TaskService } from '../../src/services/TaskService.js';
 
@@ -27,7 +27,7 @@ describe('TimerService Contract Tests', () => {
 
     // Create test tasks for the timer tests
     const task1 = await taskService.createTask('Test Task 1', 'primary');
-    const task2 = await taskService.createTask('Test Task 2', 'secondary');
+    await taskService.createTask('Test Task 2', 'secondary');
     testTaskId = task1.id;
 
     timerService = new TimerService(mockDataService, taskService);
