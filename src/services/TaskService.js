@@ -12,6 +12,13 @@ export class TaskService {
   }
 
   /**
+   * Initialize the service
+   */
+  async initialize() {
+    // TaskService initialization if needed
+  }
+
+  /**
    * Create new work task
    * @param {string} name - Task name (1-100 characters)
    * @param {string} color - DaisyUI color class

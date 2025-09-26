@@ -25,6 +25,13 @@ export class DataService {
   }
 
   /**
+   * Initialize the service
+   */
+  async initialize() {
+    this.initializeStorage();
+  }
+
+  /**
    * Initialize storage with default structure if empty
    */
   initializeStorage() {

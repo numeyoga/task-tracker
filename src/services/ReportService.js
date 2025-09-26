@@ -15,6 +15,13 @@ export class ReportService {
   }
 
   /**
+   * Initialize the service
+   */
+  async initialize() {
+    // ReportService initialization if needed
+  }
+
+  /**
    * Generate daily work report
    * @param {string} date - ISO date string (YYYY-MM-DD)
    * @returns {Object} - Daily statistics and breakdown
