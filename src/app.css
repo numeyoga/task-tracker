@@ -216,9 +216,31 @@ svg {
     color: hsl(var(--bc) / 0.8);
   }
 
-  /* Desktop-only icon sizing */
+  /* Consistent icon sizing throughout the app */
   svg {
     flex-shrink: 0;
+  }
+
+  /* Override any oversized icons */
+  .btn svg {
+    width: 1rem !important;
+    height: 1rem !important;
+  }
+
+  .btn-xs svg {
+    width: 0.75rem !important;
+    height: 0.75rem !important;
+  }
+
+  .btn-sm svg {
+    width: 1rem !important;
+    height: 1rem !important;
+  }
+
+  /* Navigation specific icons */
+  nav svg {
+    width: 1rem !important;
+    height: 1rem !important;
   }
 }
 

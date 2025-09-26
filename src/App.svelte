@@ -312,13 +312,13 @@
     <!-- Main Application Layout - Desktop Only -->
     <div class="flex min-h-screen">
       <!-- Sidebar Navigation -->
-      <aside class="w-80 bg-base-100 border-r border-base-300">
+      <aside class="w-64 bg-base-100 border-r border-base-300 flex-shrink-0">
         <Navigation />
       </aside>
 
       <!-- Main Content Area -->
-      <main class="flex-1 bg-base-200">
-        <div class="p-8">
+      <main class="flex-1 bg-base-200 min-w-0">
+        <div class="p-6 max-w-7xl">
           {#key $currentView}
             <div class="view-transition">
               <svelte:component this={CurrentViewComponent} />

@@ -21,11 +21,11 @@
 <!-- Navigation Sidebar -->
 <div class="flex flex-col h-full">
   <!-- Logo/Brand -->
-  <div class="p-6 border-b border-base-300">
-    <div class="flex items-center space-x-3">
-      <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+  <div class="p-4 border-b border-base-300">
+    <div class="flex items-center space-x-2">
+      <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
         <svg
-          class="w-6 h-6 text-primary-content"
+          class="w-4 h-4 text-primary-content"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -35,8 +35,8 @@
         </svg>
       </div>
       <div>
-        <h1 class="text-xl font-bold text-base-content">Work Timer</h1>
-        <p class="text-sm text-base-content/60">Track your productivity</p>
+        <h1 class="text-lg font-bold text-base-content">Work Timer</h1>
+        <p class="text-xs text-base-content/60">Track your productivity</p>
       </div>
     </div>
   </div>
@@ -70,18 +70,18 @@
   {/if}
 
   <!-- Navigation Menu -->
-  <nav class="flex-1 p-4">
-    <ul class="menu w-full">
+  <nav class="flex-1 p-3">
+    <ul class="space-y-1">
       {#each $navigationItems as item (item.id)}
         <li>
           <button
-            class="flex items-center space-x-3 w-full text-left p-3 rounded-lg transition-colors {item.isActive
+            class="flex items-center space-x-2 w-full text-left p-2 rounded-md transition-colors text-sm {item.isActive
               ? 'bg-primary text-primary-content'
               : 'hover:bg-base-200'}"
             on:click={() => handleNavigation(item.id)}
             aria-current={item.isActive ? 'page' : undefined}
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -89,7 +89,7 @@
                 d={icons[item.icon]}
               ></path>
             </svg>
-            <span class="font-medium">{item.name}</span>
+            <span class="font-medium text-sm">{item.name}</span>
           </button>
         </li>
       {/each}
@@ -97,20 +97,20 @@
   </nav>
 
   <!-- Quick Actions -->
-  <div class="p-4 border-t border-base-300">
-    <div class="text-xs font-semibold text-base-content/50 mb-3 uppercase tracking-wider">
+  <div class="p-3 border-t border-base-300">
+    <div class="text-xs font-semibold text-base-content/50 mb-2 uppercase tracking-wider">
       Quick Actions
     </div>
-    <div class="space-y-2">
+    <div class="space-y-1">
       {#if $timerStatus.hasActiveTimer}
         <button
-          class="btn btn-error btn-sm w-full"
+          class="btn btn-error btn-xs w-full"
           on:click={() => {
             // This would call timer actions
             console.log('Stop timer');
           }}
         >
-          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -121,8 +121,8 @@
           Stop Timer
         </button>
       {:else}
-        <button class="btn btn-primary btn-sm w-full" on:click={() => handleNavigation('timer')}>
-          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button class="btn btn-primary btn-xs w-full" on:click={() => handleNavigation('timer')}>
+          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -136,12 +136,12 @@
 
       {#if $timerStatus.hasActiveMealBreak}
         <button
-          class="btn btn-warning btn-sm w-full"
+          class="btn btn-warning btn-xs w-full"
           on:click={() => {
             console.log('Stop meal break');
           }}
         >
-          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -153,12 +153,12 @@
         </button>
       {:else}
         <button
-          class="btn btn-outline btn-sm w-full"
+          class="btn btn-outline btn-xs w-full"
           on:click={() => {
             console.log('Start meal break');
           }}
         >
-          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -173,10 +173,10 @@
   </div>
 
   <!-- Footer Info -->
-  <div class="p-4 border-t border-base-300 text-center">
-    <div class="text-xs text-base-content/50">Work Time Tracker v1.0</div>
+  <div class="p-3 border-t border-base-300 text-center">
+    <div class="text-xs text-base-content/50">Work Timer v1.0</div>
     <div class="text-xs text-base-content/40 mt-1">
-      Current View: {$currentViewInfo.name}
+      {$currentViewInfo.name}
     </div>
   </div>
 </div>
