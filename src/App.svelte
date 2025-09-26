@@ -309,48 +309,23 @@
       </div>
     </div>
   {:else}
-    <!-- Main Application Layout -->
-    <div class="drawer lg:drawer-open">
-      <input id="drawer-toggle" type="checkbox" class="drawer-toggle" />
+    <!-- Main Application Layout - Desktop Only -->
+    <div class="flex min-h-screen">
+      <!-- Sidebar Navigation -->
+      <aside class="w-80 bg-base-100 border-r border-base-300">
+        <Navigation />
+      </aside>
 
       <!-- Main Content Area -->
-      <div class="drawer-content flex flex-col">
-        <!-- Mobile Header -->
-        <div class="navbar bg-base-100 lg:hidden">
-          <div class="flex-none">
-            <label for="drawer-toggle" class="btn btn-square btn-ghost">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                ></path>
-              </svg>
-            </label>
-          </div>
-          <div class="flex-1">
-            <h1 class="text-xl font-bold">Work Time Tracker</h1>
-          </div>
-        </div>
-
-        <!-- Current View Content -->
-        <div class="flex-1 p-4 lg:p-8">
+      <main class="flex-1 bg-base-200">
+        <div class="p-8">
           {#key $currentView}
             <div class="view-transition">
               <svelte:component this={CurrentViewComponent} />
             </div>
           {/key}
         </div>
-      </div>
-
-      <!-- Sidebar Navigation -->
-      <div class="drawer-side">
-        <label for="drawer-toggle" class="drawer-overlay"></label>
-        <aside class="w-80 min-h-full bg-base-100">
-          <Navigation />
-        </aside>
-      </div>
+      </main>
     </div>
 
     <!-- Global Error Notifications -->
@@ -539,18 +514,6 @@
   :global(::-webkit-scrollbar) {
     width: 8px;
     height: 8px;
-  }
-
-  :global(::-webkit-scrollbar-track) {
-    /* @apply bg-base-200; */
-  }
-
-  :global(::-webkit-scrollbar-thumb) {
-    /* @apply bg-base-content/20 rounded-md; */
-  }
-
-  :global(::-webkit-scrollbar-thumb:hover) {
-    /* @apply bg-base-content/40; */
   }
 
   /* Focus styles for better accessibility */
