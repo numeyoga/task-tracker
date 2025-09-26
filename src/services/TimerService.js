@@ -95,6 +95,7 @@ export class TimerService {
     // Emit event
     this.emit('timerStarted', {
       taskId,
+      startTime: this.activeTimer.startTime,
       timeEntry: this.activeTimer.toJSON()
     });
 
@@ -125,6 +126,7 @@ export class TimerService {
     // Emit event
     this.emit('timerStopped', {
       taskId,
+      duration: completedEntry.duration,
       timeEntry: completedEntry.toJSON()
     });
 
@@ -141,9 +143,10 @@ export class TimerService {
     }
 
     return {
+      isActive: true,
       taskId: this.activeTimer.taskId,
       startTime: this.activeTimer.startTime,
-      elapsed: this.activeTimer.getElapsedTime(),
+      elapsedTime: this.activeTimer.getElapsedTime(),
       formattedElapsed: this.activeTimer.getFormattedDuration()
     };
   }
@@ -177,8 +180,8 @@ export class TimerService {
     const startedEntry = await this.startTimer(newTaskId);
 
     return {
-      stopped: stoppedEntry?.toJSON() || null,
-      started: startedEntry.toJSON()
+      stopped: stoppedEntry || null,
+      started: startedEntry
     };
   }
 

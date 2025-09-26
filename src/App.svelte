@@ -542,20 +542,21 @@
   }
 
   :global(::-webkit-scrollbar-track) {
-    @apply bg-base-200;
+    /* @apply bg-base-200; */
   }
 
   :global(::-webkit-scrollbar-thumb) {
-    @apply bg-base-content/20 rounded-md;
+    /* @apply bg-base-content/20 rounded-md; */
   }
 
   :global(::-webkit-scrollbar-thumb:hover) {
-    @apply bg-base-content/40;
+    /* @apply bg-base-content/40; */
   }
 
   /* Focus styles for better accessibility */
   :global(:focus-visible) {
-    @apply outline-2 outline-primary outline-offset-2;
+    outline: 2px solid hsl(var(--p));
+    outline-offset: 2px;
   }
 
   /* Animation for view transitions */

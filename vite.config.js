@@ -6,9 +6,7 @@ export default defineConfig({
   plugins: [svelte({
     compilerOptions: {
       // Enable runtime optimizations
-      dev: process.env.NODE_ENV !== 'production',
-      // Reduce bundle size
-      hydratable: false
+      dev: process.env.NODE_ENV !== 'production'
     }
   })],
 
@@ -99,8 +97,4 @@ export default defineConfig({
     exclude: []
   },
 
-  test: {
-    globals: true,
-    environment: 'jsdom'
-  }
 });

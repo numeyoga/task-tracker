@@ -46,8 +46,8 @@ export class ReportService {
         arrivalTime: workDay.arrivalTime,
         departureTime: workDay.departureTime,
         totalPresenceTime: workDay.totalPresenceTime,
-        totalTaskTime,
-        totalMealTime,
+        totalWorkTime: totalTaskTime,
+        mealBreakTime: totalMealTime,
         workingTime: workDay.totalPresenceTime - totalMealTime,
         efficiency:
           totalTaskTime > 0
@@ -134,8 +134,8 @@ export class ReportService {
 
       dailyReports.forEach((report) => {
         weeklyTotals.totalPresenceTime += report.totalPresenceTime || 0;
-        weeklyTotals.totalTaskTime += report.totalTaskTime || 0;
-        weeklyTotals.totalMealTime += report.totalMealTime || 0;
+        weeklyTotals.totalTaskTime += report.totalWorkTime || 0;
+        weeklyTotals.totalMealTime += report.mealBreakTime || 0;
         weeklyTotals.totalWorkingTime += report.workingTime || 0;
 
         // Aggregate task breakdown
@@ -175,12 +175,18 @@ export class ReportService {
         weekStart,
         weekEnd,
         weekDates,
-        dailyReports,
-        totals: weeklyTotals,
+        totalWorkTime: weeklyTotals.totalTaskTime,
+        totalPresenceTime: weeklyTotals.totalPresenceTime,
+        dailyBreakdown: dailyReports.map(day => ({
+          ...day,
+          workTime: day.totalWorkTime,
+          presenceTime: day.totalPresenceTime,
+          dayOfWeek: new Date(day.date + 'T00:00:00').toLocaleDateString('en', { weekday: 'long' })
+        })),
+        taskSummary: Array.from(taskTotals.values()).sort((a, b) => b.totalTime - a.totalTime),
         efficiency: weeklyEfficiency,
-        taskBreakdown: Array.from(taskTotals.values()).sort((a, b) => b.totalTime - a.totalTime),
         activityTotals,
-        averages: {
+        averagePerDay: {
           dailyPresence: weeklyTotals.totalPresenceTime / weekDates.length,
           dailyTaskTime: weeklyTotals.totalTaskTime / weekDates.length,
           dailyWorkingTime: weeklyTotals.totalWorkingTime / weekDates.length
@@ -300,6 +306,7 @@ export class ReportService {
       workDays.sort((a, b) => new Date(b.date) - new Date(a.date));
 
       return {
+        entries: enrichedTimeEntries,
         timeEntries: enrichedTimeEntries,
         mealBreaks,
         workDays,
@@ -307,10 +314,15 @@ export class ReportService {
         dateRange,
         totalEntries: enrichedTimeEntries.length,
         totalMealBreaks: mealBreaks.length,
-        totalWorkDays: workDays.length
+        totalWorkDays: workDays.length,
+        summary: {
+          totalTime: enrichedTimeEntries.reduce((sum, entry) => sum + (entry.duration || 0), 0),
+          totalSessions: enrichedTimeEntries.length,
+          uniqueTasks: new Set(enrichedTimeEntries.map(e => e.taskId)).size,
+          dateRange: dateRange
+        }
       };
     } catch (error) {
-      console.error('Error getting audit data:', error);
       throw error;
     }
   }
@@ -336,9 +348,11 @@ export class ReportService {
           hasData: false,
           arrivalTime: null,
           departureTime: null,
-          totalPresenceTime: 0,
-          totalMealTime: 0,
-          workingTime: 0
+          totalPresence: 0,
+          workTime: 0,
+          mealBreaks: [],
+          otherBreaks: [],
+          idleTime: 0
         };
       }
 
@@ -357,11 +371,12 @@ export class ReportService {
         hasData: true,
         arrivalTime,
         departureTime,
-        totalPresenceTime,
-        totalMealTime,
-        workingTime,
-        entries: timeEntries.length,
-        mealBreaks: mealBreaks.length
+        totalPresence: totalPresenceTime,
+        workTime: workingTime,
+        mealBreaks: mealBreaks,
+        otherBreaks: [],
+        idleTime: Math.max(0, workingTime - timeEntries.reduce((sum, entry) => sum + (entry.duration || 0), 0)),
+        entries: timeEntries.length
       };
     } catch (error) {
       console.error('Error calculating presence time:', error);
@@ -392,7 +407,18 @@ export class ReportService {
 
       switch (format) {
         case 'json':
-          exportData = JSON.stringify(weeklyReport, null, 2);
+          exportData = JSON.stringify({
+            weekStart: weeklyReport.weekStart,
+            weekEnd: weeklyReport.weekEnd,
+            tasks: weeklyReport.taskSummary,
+            dailyTotals: weeklyReport.dailyBreakdown,
+            totals: {
+              totalWorkTime: weeklyReport.totalWorkTime,
+              totalPresenceTime: weeklyReport.totalPresenceTime
+            },
+            efficiency: weeklyReport.efficiency,
+            averagePerDay: weeklyReport.averagePerDay
+          }, null, 2);
           break;
         case 'csv':
           exportData = this.formatAsCSV(weeklyReport);
@@ -430,8 +456,23 @@ export class ReportService {
     if (typeof dateString !== 'string') return false;
     const regex = /^\d{4}-\d{2}-\d{2}$/;
     if (!regex.test(dateString)) return false;
-    const date = new Date(dateString + 'T00:00:00');
-    return date.toISOString().split('T')[0] === dateString;
+
+    // Parse date parts to avoid timezone issues
+    const parts = dateString.split('-');
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10);
+    const day = parseInt(parts[2], 10);
+
+    // Validate ranges
+    if (year < 1900 || year > 2100) return false;
+    if (month < 1 || month > 12) return false;
+    if (day < 1 || day > 31) return false;
+
+    // Use Date.UTC to avoid timezone issues
+    const date = new Date(Date.UTC(year, month - 1, day));
+    return date.getUTCFullYear() === year &&
+           date.getUTCMonth() === month - 1 &&
+           date.getUTCDate() === day;
   }
 
   isValidDateRange(dateRange) {
@@ -571,29 +612,26 @@ export class ReportService {
 
   formatAsCSV(weeklyReport) {
     const lines = [];
-    lines.push(
-      'Date,Total Presence (hours),Task Time (hours),Meal Time (hours),Working Time (hours),Efficiency (%)'
-    );
 
-    weeklyReport.dailyReports.forEach((report) => {
-      const presenceHours = (report.totalPresenceTime / (1000 * 60 * 60)).toFixed(2);
-      const taskHours = (report.totalTaskTime / (1000 * 60 * 60)).toFixed(2);
-      const mealHours = (report.totalMealTime / (1000 * 60 * 60)).toFixed(2);
-      const workingHours = (report.workingTime / (1000 * 60 * 60)).toFixed(2);
+    // Create task-by-day matrix
+    lines.push('Task,Monday,Tuesday,Wednesday,Thursday,Friday,Total');
 
-      lines.push(
-        `${report.date},${presenceHours},${taskHours},${mealHours},${workingHours},${report.efficiency}`
-      );
-    });
+    // Get all tasks and create a matrix of time per day
+    weeklyReport.taskSummary.forEach((task) => {
+      const taskRow = [task.taskName];
 
-    lines.push(''); // Empty line
-    lines.push('Task Breakdown:');
-    lines.push('Task,Total Time (hours),Sessions,Average Session (hours)');
+      // Add time for each day of the week
+      weeklyReport.dailyBreakdown.forEach((day) => {
+        const taskTimeForDay = day.taskBreakdown?.find(t => t.taskId === task.taskId)?.totalTime || 0;
+        const hours = (taskTimeForDay / (1000 * 60 * 60)).toFixed(1);
+        taskRow.push(hours);
+      });
 
-    weeklyReport.taskBreakdown.forEach((task) => {
-      const totalHours = (task.totalTime / (1000 * 60 * 60)).toFixed(2);
-      const avgHours = (task.averageSession / (1000 * 60 * 60)).toFixed(2);
-      lines.push(`${task.taskName},${totalHours},${task.sessionCount},${avgHours}`);
+      // Add total for the task
+      const totalHours = (task.totalTime / (1000 * 60 * 60)).toFixed(1);
+      taskRow.push(totalHours);
+
+      lines.push(taskRow.join(','));
     });
 
     return lines.join('\n');
@@ -601,32 +639,30 @@ export class ReportService {
 
   formatAsText(weeklyReport) {
     const lines = [];
-    lines.push(`Weekly Report: ${weeklyReport.weekStart} to ${weeklyReport.weekEnd}`);
+    lines.push(`Week of ${weeklyReport.weekStart} to ${weeklyReport.weekEnd}`);
     lines.push('='.repeat(50));
     lines.push('');
 
     lines.push('Daily Summary:');
-    weeklyReport.dailyReports.forEach((report) => {
+    weeklyReport.dailyBreakdown.forEach((report) => {
       const presenceHours = (report.totalPresenceTime / (1000 * 60 * 60)).toFixed(1);
-      const taskHours = (report.totalTaskTime / (1000 * 60 * 60)).toFixed(1);
+      const taskHours = (report.totalWorkTime / (1000 * 60 * 60)).toFixed(1);
       lines.push(
         `${report.date}: ${presenceHours}h presence, ${taskHours}h tasks, ${report.efficiency}% efficiency`
       );
     });
 
     lines.push('');
-    lines.push('Weekly Totals:');
-    const totalPresenceHours = (weeklyReport.totals.totalPresenceTime / (1000 * 60 * 60)).toFixed(
-      1
-    );
-    const totalTaskHours = (weeklyReport.totals.totalTaskTime / (1000 * 60 * 60)).toFixed(1);
+    lines.push('Total:');
+    const totalPresenceHours = (weeklyReport.totalPresenceTime / (1000 * 60 * 60)).toFixed(1);
+    const totalTaskHours = (weeklyReport.totalWorkTime / (1000 * 60 * 60)).toFixed(1);
     lines.push(`Total Presence: ${totalPresenceHours} hours`);
     lines.push(`Total Task Time: ${totalTaskHours} hours`);
     lines.push(`Overall Efficiency: ${weeklyReport.efficiency}%`);
 
     lines.push('');
     lines.push('Task Breakdown:');
-    weeklyReport.taskBreakdown.forEach((task) => {
+    weeklyReport.taskSummary.forEach((task) => {
       const hours = (task.totalTime / (1000 * 60 * 60)).toFixed(1);
       lines.push(`${task.taskName}: ${hours}h (${task.sessionCount} sessions)`);
     });

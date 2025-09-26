@@ -15,10 +15,11 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- Theme Settings -->
         <div class="form-control">
-          <label class="label">
+          <label class="label" for="theme-select">
             <span class="label-text font-semibold">Theme</span>
           </label>
           <select
+            id="theme-select"
             class="select select-bordered"
             bind:value={$currentSettings.theme}
             on:change={(e) => settingsActions.updateSetting('theme', e.target.value)}
@@ -27,16 +28,16 @@
               <option value={theme.value}>{theme.label}</option>
             {/each}
           </select>
-          <label class="label">
+          <div class="label">
             <span class="label-text-alt">Choose your preferred color theme</span>
-          </label>
+          </div>
         </div>
 
         <!-- Time Format -->
         <div class="form-control">
-          <label class="label">
+          <div class="label">
             <span class="label-text font-semibold">Time Format</span>
-          </label>
+          </div>
           <div class="flex space-x-4">
             <label class="cursor-pointer label">
               <input
@@ -61,10 +62,11 @@
 
         <!-- Daily Presence Requirement -->
         <div class="form-control">
-          <label class="label">
+          <label class="label" for="daily-presence-input">
             <span class="label-text font-semibold">Required Daily Presence</span>
           </label>
           <input
+            id="daily-presence-input"
             type="number"
             min="1"
             max="16"
@@ -77,17 +79,18 @@
                 parseFloat(e.target.value) * 60 * 60 * 1000
               )}
           />
-          <label class="label">
+          <div class="label">
             <span class="label-text-alt">Hours per day (1-16)</span>
-          </label>
+          </div>
         </div>
 
         <!-- Timer Max Duration -->
         <div class="form-control">
-          <label class="label">
+          <label class="label" for="timer-max-duration-input">
             <span class="label-text font-semibold">Timer Max Duration</span>
           </label>
           <input
+            id="timer-max-duration-input"
             type="number"
             min="1"
             max="24"
@@ -100,17 +103,18 @@
                 parseFloat(e.target.value) * 60 * 60 * 1000
               )}
           />
-          <label class="label">
+          <div class="label">
             <span class="label-text-alt">Auto-stop timer after this many hours (1-24)</span>
-          </label>
+          </div>
         </div>
 
         <!-- Auto Save Interval -->
         <div class="form-control">
-          <label class="label">
+          <label class="label" for="auto-save-interval-input">
             <span class="label-text font-semibold">Auto-Save Interval</span>
           </label>
           <input
+            id="auto-save-interval-input"
             type="number"
             min="1"
             max="300"
@@ -119,17 +123,18 @@
             on:change={(e) =>
               settingsActions.updateSetting('autoSaveInterval', parseInt(e.target.value) * 1000)}
           />
-          <label class="label">
+          <div class="label">
             <span class="label-text-alt">Seconds between auto-saves (1-300)</span>
-          </label>
+          </div>
         </div>
 
         <!-- Data Retention -->
         <div class="form-control">
-          <label class="label">
+          <label class="label" for="data-retention-input">
             <span class="label-text font-semibold">Data Retention</span>
           </label>
           <input
+            id="data-retention-input"
             type="number"
             min="1"
             max="52"
@@ -138,9 +143,9 @@
             on:change={(e) =>
               settingsActions.updateSetting('dataRetentionWeeks', parseInt(e.target.value))}
           />
-          <label class="label">
+          <div class="label">
             <span class="label-text-alt">Weeks to keep historical data (1-52)</span>
-          </label>
+          </div>
         </div>
       </div>
 
