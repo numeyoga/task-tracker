@@ -14,22 +14,22 @@
     <div class="card-body">
       <div class="flex flex-wrap gap-4 items-center">
         <div class="form-control">
-          <label class="label">
+          <label class="label" for="from-date-input">
             <span class="label-text">From Date</span>
           </label>
-          <input type="date" class="input input-bordered input-sm" />
+          <input id="from-date-input" type="date" class="input input-bordered input-sm" />
         </div>
         <div class="form-control">
-          <label class="label">
+          <label class="label" for="to-date-input">
             <span class="label-text">To Date</span>
           </label>
-          <input type="date" class="input input-bordered input-sm" />
+          <input id="to-date-input" type="date" class="input input-bordered input-sm" />
         </div>
         <div class="form-control">
-          <label class="label">
+          <label class="label" for="task-select">
             <span class="label-text">Task</span>
           </label>
-          <select class="select select-bordered select-sm">
+          <select id="task-select" class="select select-bordered select-sm">
             <option>All Tasks</option>
           </select>
         </div>

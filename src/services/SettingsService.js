@@ -173,7 +173,7 @@ export class SettingsService {
 
     const settings = await this.getSettings();
 
-    if (!settings.hasOwnProperty(key)) {
+    if (!Object.prototype.hasOwnProperty.call(settings, key)) {
       throw new SettingNotFoundError(`Setting '${key}' not found`);
     }
 

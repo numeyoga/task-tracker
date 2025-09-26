@@ -1,5 +1,5 @@
 <script>
-  import { allTasks, taskActions } from '../../stores/tasks.js';
+  import { allTasks } from '../../stores/tasks.js';
 </script>
 
 <div class="max-w-4xl mx-auto space-y-6">

@@ -3,7 +3,7 @@
 </script>
 
 <script>
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
 
   export let error = null;
   export let type = 'general';
@@ -78,9 +78,11 @@
     clearTimeout(timeoutId);
   }
 
-  $: if (typeof window !== 'undefined') {
-    window.addEventListener('beforeunload', onDestroy);
-  }
+  onMount(() => {
+    if (typeof window !== 'undefined') {
+      window.addEventListener('beforeunload', onDestroy);
+    }
+  });
 </script>
 
 {#if visible && error}

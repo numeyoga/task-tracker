@@ -64,20 +64,6 @@
     }
   }
 
-  function handleToggleMealBreak() {
-    if ($mealBreakState.isRunning) {
-      handleStopMealBreak();
-    } else {
-      handleStartMealBreak();
-    }
-  }
-
-  function formatMealBreakDuration(milliseconds) {
-    const totalSeconds = Math.floor(milliseconds / 1000);
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  }
 </script>
 
 <div class="card bg-base-100 border border-warning/20 {classes.container}">
@@ -188,21 +174,21 @@
             <button
               class="btn btn-ghost btn-sm flex-1"
               disabled={isProcessing || !canStartMealBreak}
-              on:click={() => { handleStartMealBreak(); dispatch('setDuration', { minutes: 30 }); }}"
+              on:click={() => { handleStartMealBreak(); dispatch('setDuration', { minutes: 30 }); }}
             >
               30 min
             </button>
             <button
               class="btn btn-ghost btn-sm flex-1"
               disabled={isProcessing || !canStartMealBreak}
-              on:click={() => { handleStartMealBreak(); dispatch('setDuration', { minutes: 60 }); }}"
+              on:click={() => { handleStartMealBreak(); dispatch('setDuration', { minutes: 60 }); }}
             >
               60 min
             </button>
             <button
               class="btn btn-ghost btn-sm flex-1"
               disabled={isProcessing || !canStartMealBreak}
-              on:click={() => { handleStartMealBreak(); dispatch('setDuration', { minutes: 90 }); }}"
+              on:click={() => { handleStartMealBreak(); dispatch('setDuration', { minutes: 90 }); }}
             >
               90 min
             </button>

@@ -31,7 +31,7 @@ export class TaskService {
     }
 
     // Check for duplicate names
-    const existingTasks = await this.getAllTasks();
+    const existingTasks = this.getAllTasks();
     const duplicateTask = existingTasks.find(
       (task) => task.name.toLowerCase() === name.trim().toLowerCase()
     );
@@ -52,7 +52,7 @@ export class TaskService {
     await this.saveTask(task);
 
     // Emit event
-    this.emit('taskCreated', task.toJSON());
+    this.emit('taskCreated', task);
 
     return task;
   }
@@ -73,7 +73,7 @@ export class TaskService {
     }
 
     // Get existing task
-    const task = await this.getTaskById(taskId);
+    const task = this.getTaskById(taskId);
     if (!task) {
       throw new TaskNotFoundError(`Task with ID ${taskId} not found`);
     }
@@ -90,7 +90,7 @@ export class TaskService {
       }
 
       // Check for duplicate names (excluding current task)
-      const existingTasks = await this.getAllTasks();
+      const existingTasks = this.getAllTasks();
       const duplicateTask = existingTasks.find(
         (t) => t.id !== taskId && t.name.toLowerCase() === updates.name.trim().toLowerCase()
       );
@@ -133,11 +133,13 @@ export class TaskService {
 
     // Only save if there were changes
     if (changes.length > 0) {
+      // Set updatedAt manually since we've made changes
+      task.updatedAt = new Date();
       await this.saveTask(task);
 
       // Emit event
       this.emit('taskUpdated', {
-        task: task.toJSON(),
+        task: task,
         changes
       });
     }
@@ -156,7 +158,7 @@ export class TaskService {
     }
 
     // Get existing task
-    const task = await this.getTaskById(taskId);
+    const task = this.getTaskById(taskId);
     if (!task) {
       throw new TaskNotFoundError(`Task with ID ${taskId} not found`);
     }
@@ -182,7 +184,7 @@ export class TaskService {
    * Get all active tasks
    * @returns {Task[]} - Array of active tasks
    */
-  async getAllTasks() {
+  getAllTasks() {
     if (!this.dataService) {
       return [];
     }
@@ -203,10 +205,10 @@ export class TaskService {
   /**
    * Get task by ID
    * @param {string} taskId - Task identifier
-   * @returns {Promise<Task|null>} - Task or null if not found
+   * @returns {Task|null} - Task or null if not found
    */
-  async getTaskById(taskId) {
-    const tasks = await this.getAllTasks();
+  getTaskById(taskId) {
+    const tasks = this.getAllTasks();
     return tasks.find((task) => task.id === taskId) || null;
   }
 
@@ -214,8 +216,8 @@ export class TaskService {
    * Get currently active task
    * @returns {Task|null} - Active task or null
    */
-  async getActiveTask() {
-    const tasks = await this.getAllTasks();
+  getActiveTask() {
+    const tasks = this.getAllTasks();
     return tasks.find((task) => task.isActive) || null;
   }
 
@@ -230,7 +232,7 @@ export class TaskService {
     }
 
     // Get the task to activate
-    const task = await this.getTaskById(taskId);
+    const task = this.getTaskById(taskId);
     if (!task) {
       throw new TaskNotFoundError(`Task with ID ${taskId} not found`);
     }
@@ -244,11 +246,11 @@ export class TaskService {
     await this.deactivateAllTasks();
 
     // Set this task as active
-    task.isActive = true;
+    task.activate(); // This will set isActive, activatedAt, and updatedAt
     await this.saveTask(task);
 
     // Emit event
-    this.emit('taskActivated', task.toJSON());
+    this.emit('taskActivated', task);
 
     return task;
   }
@@ -265,7 +267,7 @@ export class TaskService {
     }
 
     // Verify task exists
-    const task = await this.getTaskById(taskId);
+    const task = this.getTaskById(taskId);
     if (!task) {
       throw new TaskNotFoundError(`Task with ID ${taskId} not found`);
     }
@@ -307,11 +309,11 @@ export class TaskService {
       return {
         taskId: task.id,
         taskName: task.name,
-        totalDuration,
-        sessionCount,
-        averageSession,
-        dailyBreakdown,
-        dateRange: dateRange || null
+        totalTime: totalDuration,
+        averagePerDay: totalDuration / Math.max(1, Object.keys(this.groupEntriesByDate(timeEntries)).length),
+        entriesCount: sessionCount,
+        dateRange: dateRange || null,
+        dailyBreakdown
       };
     } catch (error) {
       console.error('Error calculating task stats:', error);
@@ -324,7 +326,7 @@ export class TaskService {
    * @param {string} taskId - Task identifier
    */
   async updateTaskTotalTime(taskId) {
-    const task = await this.getTaskById(taskId);
+    const task = this.getTaskById(taskId);
     if (!task) return;
 
     if (!this.dataService) return;
@@ -351,7 +353,7 @@ export class TaskService {
    * Deactivate all tasks
    */
   async deactivateAllTasks() {
-    const tasks = await this.getAllTasks();
+    const tasks = this.getAllTasks();
     const activeTasks = tasks.filter((task) => task.isActive);
 
     for (const task of activeTasks) {
@@ -414,11 +416,11 @@ export class TaskService {
     return {
       taskId: task.id,
       taskName: task.name,
-      totalDuration: 0,
-      sessionCount: 0,
-      averageSession: 0,
-      dailyBreakdown: {},
-      dateRange: null
+      totalTime: 0,
+      averagePerDay: 0,
+      entriesCount: 0,
+      dateRange: null,
+      dailyBreakdown: {}
     };
   }
 

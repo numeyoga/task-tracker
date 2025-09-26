@@ -251,6 +251,9 @@
       const settings = await settingsService.getSettings();
       dataService.startAutoSave(settings.autoSaveInterval || 30000);
 
+      // Start automatic data cleanup with settings-based retention
+      dataService.startAutoCleanup(settings.dataRetentionWeeks || 5, 24); // Run daily
+
       // Apply initial theme from settings
       document.documentElement.setAttribute('data-theme', settings.theme || 'bumblebee');
 
@@ -374,6 +377,7 @@
             <button
               class="btn btn-sm btn-circle btn-ghost"
               on:click={() => (isShortcutHelpVisible = false)}
+              aria-label="Close keyboard shortcuts help"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -503,7 +507,14 @@
             <button class="btn" on:click={() => (isShortcutHelpVisible = false)}> Close </button>
           </div>
         </div>
-        <div class="modal-backdrop" on:click={() => (isShortcutHelpVisible = false)}></div>
+        <div
+          class="modal-backdrop"
+          role="button"
+          tabindex="0"
+          on:click={() => (isShortcutHelpVisible = false)}
+          on:keydown={(e) => e.key === 'Enter' && (isShortcutHelpVisible = false)}
+          aria-label="Close modal"
+        ></div>
       </div>
     {/if}
   {/if}
@@ -531,20 +542,21 @@
   }
 
   :global(::-webkit-scrollbar-track) {
-    @apply bg-base-200;
+    /* @apply bg-base-200; */
   }
 
   :global(::-webkit-scrollbar-thumb) {
-    @apply bg-base-content/20 rounded-md;
+    /* @apply bg-base-content/20 rounded-md; */
   }
 
   :global(::-webkit-scrollbar-thumb:hover) {
-    @apply bg-base-content/40;
+    /* @apply bg-base-content/40; */
   }
 
   /* Focus styles for better accessibility */
   :global(:focus-visible) {
-    @apply outline-2 outline-primary outline-offset-2;
+    outline: 2px solid hsl(var(--p));
+    outline-offset: 2px;
   }
 
   /* Animation for view transitions */

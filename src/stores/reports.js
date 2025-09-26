@@ -461,12 +461,14 @@ export const reportUtils = {
     switch (format) {
       case 'hm': // "8h 30m"
         return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
-      case 'hms': // "8:30:00"
+      case 'hms': {// "8:30:00"
         const seconds = Math.floor((milliseconds % (1000 * 60)) / 1000);
         return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-      case 'decimal': // "8.5h"
+      }
+      case 'decimal': {// "8.5h"
         const decimalHours = milliseconds / (1000 * 60 * 60);
         return `${Math.round(decimalHours * 100) / 100}h`;
+      }
       default:
         return `${hours}h ${minutes}m`;
     }

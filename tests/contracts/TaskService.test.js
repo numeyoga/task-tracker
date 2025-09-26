@@ -1,11 +1,23 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { TaskService } from '../../src/services/TaskService.js';
+import { TaskService, ValidationError, TaskNotFoundError, DuplicateTaskNameError, ActiveTaskDeleteError } from '../../src/services/TaskService.js';
 
 describe('TaskService Contract Tests', () => {
   let taskService;
+  let mockDataService;
 
   beforeEach(() => {
-    taskService = new TaskService();
+    // Create a mock DataService
+    mockDataService = {
+      data: { tasks: [], timeEntries: [] },
+      loadData() {
+        return this.data;
+      },
+      async saveData(data) {
+        this.data = { ...data };
+      }
+    };
+
+    taskService = new TaskService(mockDataService);
   });
 
   afterEach(() => {
@@ -31,20 +43,20 @@ describe('TaskService Contract Tests', () => {
     });
 
     it('should throw ValidationError for empty task name', async () => {
-      await expect(taskService.createTask('', 'primary')).rejects.toThrow('ValidationError');
+      await expect(taskService.createTask('', 'primary')).rejects.toThrow(ValidationError);
     });
 
     it('should throw ValidationError for task name longer than 100 characters', async () => {
       const longName = 'a'.repeat(101);
 
-      await expect(taskService.createTask(longName, 'primary')).rejects.toThrow('ValidationError');
+      await expect(taskService.createTask(longName, 'primary')).rejects.toThrow(ValidationError);
     });
 
     it('should throw DuplicateTaskNameError for duplicate task names', async () => {
       await taskService.createTask('Test Task', 'primary');
 
       await expect(taskService.createTask('Test Task', 'secondary')).rejects.toThrow(
-        'DuplicateTaskNameError'
+        DuplicateTaskNameError
       );
     });
   });
@@ -65,7 +77,7 @@ describe('TaskService Contract Tests', () => {
 
     it('should throw TaskNotFoundError for invalid task ID', async () => {
       await expect(taskService.updateTask('invalid-id', { name: 'Test' })).rejects.toThrow(
-        'TaskNotFoundError'
+        TaskNotFoundError
       );
     });
 
@@ -73,7 +85,7 @@ describe('TaskService Contract Tests', () => {
       const task = await taskService.createTask('Test Task', 'primary');
 
       await expect(taskService.updateTask(task.id, { name: '' })).rejects.toThrow(
-        'ValidationError'
+        ValidationError
       );
     });
   });
@@ -92,14 +104,14 @@ describe('TaskService Contract Tests', () => {
     });
 
     it('should throw TaskNotFoundError for invalid task ID', async () => {
-      await expect(taskService.deleteTask('invalid-id')).rejects.toThrow('TaskNotFoundError');
+      await expect(taskService.deleteTask('invalid-id')).rejects.toThrow(TaskNotFoundError);
     });
 
     it('should throw ActiveTaskDeleteError when trying to delete active task', async () => {
       const task = await taskService.createTask('Active Task', 'primary');
       await taskService.setActiveTask(task.id);
 
-      await expect(taskService.deleteTask(task.id)).rejects.toThrow('ActiveTaskDeleteError');
+      await expect(taskService.deleteTask(task.id)).rejects.toThrow(ActiveTaskDeleteError);
     });
   });
 
@@ -170,7 +182,7 @@ describe('TaskService Contract Tests', () => {
     });
 
     it('should throw TaskNotFoundError for invalid task ID', async () => {
-      await expect(taskService.setActiveTask('invalid-id')).rejects.toThrow('TaskNotFoundError');
+      await expect(taskService.setActiveTask('invalid-id')).rejects.toThrow(TaskNotFoundError);
     });
   });
 
@@ -201,7 +213,7 @@ describe('TaskService Contract Tests', () => {
       };
 
       await expect(taskService.getTaskStats('invalid-id', dateRange)).rejects.toThrow(
-        'TaskNotFoundError'
+        TaskNotFoundError
       );
     });
   });

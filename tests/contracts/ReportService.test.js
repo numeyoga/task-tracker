@@ -1,11 +1,23 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { ReportService } from '../../src/services/ReportService.js';
+import { ReportService, InvalidDateError, InvalidDateRangeError, UnsupportedFormatError } from '../../src/services/ReportService.js';
 
 describe('ReportService Contract Tests', () => {
   let reportService;
+  let mockDataService;
 
   beforeEach(() => {
-    reportService = new ReportService();
+    // Create a mock DataService
+    mockDataService = {
+      data: { tasks: [], timeEntries: [], workDays: [], mealBreaks: [] },
+      loadData() {
+        return this.data;
+      },
+      async saveData(data) {
+        this.data = { ...data };
+      }
+    };
+
+    reportService = new ReportService(mockDataService);
   });
 
   afterEach(() => {
@@ -35,7 +47,7 @@ describe('ReportService Contract Tests', () => {
 
     it('should throw InvalidDateError for invalid date format', async () => {
       await expect(reportService.getDailyReport('invalid-date')).rejects.toThrow(
-        'InvalidDateError'
+        InvalidDateError
       );
     });
 
@@ -82,7 +94,7 @@ describe('ReportService Contract Tests', () => {
     it('should throw InvalidDateError for non-Monday date', async () => {
       const tuesday = '2023-09-26';
 
-      await expect(reportService.getWeeklyReport(tuesday)).rejects.toThrow('InvalidDateError');
+      await expect(reportService.getWeeklyReport(tuesday)).rejects.toThrow(InvalidDateError);
     });
 
     it('should format task summary with hh:mm format', async () => {
@@ -99,8 +111,8 @@ describe('ReportService Contract Tests', () => {
   });
 
   describe('getAvailableWeeks method', () => {
-    it('should return array of week options', () => {
-      const result = reportService.getAvailableWeeks();
+    it('should return array of week options', async () => {
+      const result = await reportService.getAvailableWeeks();
 
       expect(Array.isArray(result)).toBe(true);
 
@@ -174,7 +186,7 @@ describe('ReportService Contract Tests', () => {
       };
 
       await expect(reportService.getAuditData(invalidRange)).rejects.toThrow(
-        'InvalidDateRangeError'
+        InvalidDateRangeError
       );
     });
   });
@@ -250,7 +262,7 @@ describe('ReportService Contract Tests', () => {
 
     it('should throw UnsupportedFormatError for invalid format', async () => {
       await expect(reportService.exportWeeklyData('2023-09-25', 'xml')).rejects.toThrow(
-        'UnsupportedFormatError'
+        UnsupportedFormatError
       );
     });
   });

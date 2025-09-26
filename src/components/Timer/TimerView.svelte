@@ -1,6 +1,6 @@
 <script>
   import { timerState, mealBreakState, timerActions } from '../../stores/timer.js';
-  import { allTasks, activeTask, taskActions } from '../../stores/tasks.js';
+  import { allTasks, activeTask } from '../../stores/tasks.js';
 
   // Timer display components would go here - for now using inline implementation
   let selectedTaskId = null;
@@ -75,10 +75,10 @@
       <!-- Task Selection -->
       {#if !$timerState.isRunning}
         <div class="mb-6">
-          <label class="label">
+          <label class="label" for="task-select">
             <span class="label-text font-semibold">Select Task</span>
           </label>
-          <select class="select select-bordered w-full max-w-md" bind:value={selectedTaskId}>
+          <select id="task-select" class="select select-bordered w-full max-w-md" bind:value={selectedTaskId}>
             <option value={null}>Choose a task...</option>
             {#each $allTasks as task (task.id)}
               <option value={task.id}>{task.name}</option>

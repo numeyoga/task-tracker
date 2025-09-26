@@ -22,7 +22,6 @@
 
   let errors = {};
   let isSubmitting = false;
-  let modalRef;
   let correctionType = 'time'; // 'time', 'task', 'duration', 'split'
 
   // Available correction reasons
@@ -49,7 +48,7 @@
   }
 
   $: selectedTask = $allTasks.find((task) => task.id === formData.taskId);
-  $: isValid = validateForm();
+  $: isValid = formData && validateForm();
   $: title = mode === 'create' ? 'Add Time Entry' : 'Correct Time Entry';
 
   function formatDateTimeLocal(date) {
@@ -116,19 +115,6 @@
     return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
   }
 
-  function getTaskColorClass(color) {
-    const colorMap = {
-      primary: 'text-primary',
-      secondary: 'text-secondary',
-      accent: 'text-accent',
-      success: 'text-success',
-      warning: 'text-warning',
-      error: 'text-error',
-      info: 'text-info',
-      neutral: 'text-neutral'
-    };
-    return colorMap[color] || colorMap.primary;
-  }
 
   function getTaskBgClass(color) {
     const colorMap = {
@@ -222,7 +208,6 @@
 
   // Auto-focus first input when modal opens
   function handleModalOpen(node) {
-    modalRef = node;
     const firstInput = node.querySelector('select, input');
     if (firstInput) {
       setTimeout(() => firstInput.focus(), 100);
@@ -238,6 +223,7 @@
   function adjustTime(field, minutes) {
     if (!formData[field]) return;
 
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
     const current = new Date(formData[field]);
     current.setMinutes(current.getMinutes() + minutes);
     formData[field] = formatDateTimeLocal(current);
@@ -247,6 +233,7 @@
     if (!formData.startTime) return;
 
     const start = new Date(formData.startTime);
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
     const suggestedEnd = new Date(start);
     suggestedEnd.setHours(suggestedEnd.getHours() + 1); // Default 1 hour session
 
@@ -334,7 +321,7 @@
             required
           >
             <option value="">Select a task...</option>
-            {#each $allTasks.filter((t) => !t.isArchived) as task}
+            {#each $allTasks.filter((t) => !t.isArchived) as task (task.id)}
               <option value={task.id}>{task.name}</option>
             {/each}
           </select>
@@ -482,7 +469,7 @@
               required
             >
               <option value="">Select a reason...</option>
-              {#each correctionReasons as reason}
+              {#each correctionReasons as reason (reason)}
                 <option value={reason}>{reason}</option>
               {/each}
             </select>

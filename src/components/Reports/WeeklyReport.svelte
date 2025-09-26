@@ -1,8 +1,6 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-  import { derived } from 'svelte/store';
   import { allTasks } from '../../stores/tasks.js';
-  import { reportsStore, reportsActions } from '../../stores/reports.js';
 
   const dispatch = createEventDispatcher();
 
@@ -11,7 +9,6 @@
   export let showExportOptions = true;
 
   let isLoading = false;
-  let selectedTaskIds = [];
 
   // Calculate week dates
   $: weekDates = getWeekDates(weekOffset);
@@ -23,6 +20,7 @@
   function getWeekDates(offset = 0) {
     const today = new Date();
     const currentDay = today.getDay();
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
     const monday = new Date(today);
 
     // Get Monday of the target week
@@ -31,6 +29,7 @@
     const dates = [];
     for (let i = 0; i < 5; i++) {
       // Monday to Friday
+      // eslint-disable-next-line svelte/prefer-svelte-reactivity
       const date = new Date(monday);
       date.setDate(monday.getDate() + i);
       dates.push(date);
@@ -54,7 +53,7 @@
 
   function generateWeeklyData(dates, tasks) {
     // In a real app, this would fetch actual data from the service
-    const dailyData = dates.map((date, dayIndex) => {
+    const dailyData = dates.map((date) => {
       const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
       const isWeekend = date.getDay() === 0 || date.getDay() === 6;
       const isFuture = date > new Date();
@@ -293,7 +292,7 @@
                     <span class="text-base-content/50">—</span>
                   {:else}
                     <div class="flex flex-wrap gap-1">
-                      {#each day.taskData.slice(0, 2) as task}
+                      {#each day.taskData.slice(0, 2) as task (task.id || task.name)}
                         <div class="badge badge-sm {getColorClass(task.color)} badge-outline">
                           {task.name}: {formatHours(task.minutes)}
                         </div>
@@ -319,7 +318,7 @@
     <div class="card-body">
       <h3 class="card-title">Task Distribution</h3>
 
-      {#each $allTasks.slice(0, 5) as task}
+      {#each $allTasks.slice(0, 5) as task (task.id)}
         {@const weekMinutes = weeklyData.dailyData.reduce((sum, day) => {
           const taskDay = day.taskData.find((t) => t.id === task.id);
           return sum + (taskDay?.minutes || 0);

@@ -75,7 +75,7 @@ export const timerActions = {
         timerError.set(null);
       });
 
-      timerService.on('timerStopped', (data) => {
+      timerService.on('timerStopped', () => {
         timerState.update((state) => ({
           ...state,
           isRunning: false,
@@ -119,7 +119,7 @@ export const timerActions = {
         }));
       });
 
-      timerService.on('mealBreakStopped', (data) => {
+      timerService.on('mealBreakStopped', () => {
         mealBreakState.update((state) => ({
           ...state,
           isRunning: false,
@@ -153,7 +153,7 @@ export const timerActions = {
   /**
    * Start timer for specific task
    */
-  async startTimer(taskId, taskName) {
+  async startTimer(taskId) {
     try {
       const timerService = getTimerService();
       await timerService.startTimer(taskId);
@@ -181,7 +181,7 @@ export const timerActions = {
   /**
    * Switch to different task
    */
-  async switchTask(newTaskId, newTaskName) {
+  async switchTask(newTaskId) {
     try {
       const timerService = getTimerService();
       await timerService.switchTask(newTaskId);
@@ -260,7 +260,7 @@ export const timerActions = {
   /**
    * Set up meal break tick updates (since meal break might not emit regular ticks)
    */
-  setupMealBreakTicks(timerService) {
+  setupMealBreakTicks() {
     setInterval(() => {
       const currentMealBreak = get(mealBreakState);
       if (currentMealBreak.isRunning && currentMealBreak.startTime) {
