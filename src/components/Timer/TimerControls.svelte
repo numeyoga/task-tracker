@@ -275,6 +275,6 @@
 
 <style>
   .dropdown-content {
-    z-index: 1000;
+    z-index: var(--z-dropdown);
   }
 </style>
