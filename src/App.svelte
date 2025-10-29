@@ -10,6 +10,7 @@
   // Import main layout components
   import Navigation from './components/Navigation.svelte';
   import ErrorNotification from './components/ErrorNotification.svelte';
+  import SmoothTransition from './components/SmoothTransition.svelte';
 
   // Import view components
   import TimerView from './components/Timer/TimerView.svelte';
@@ -320,9 +321,11 @@
       <main class="flex-1 bg-base-200 min-w-0">
         <div class="p-6 max-w-7xl">
           {#key $currentView}
-            <div class="view-transition">
-              <svelte:component this={CurrentViewComponent} />
-            </div>
+            <SmoothTransition duration={300}>
+              <div class="view-transition">
+                <svelte:component this={CurrentViewComponent} />
+              </div>
+            </SmoothTransition>
           {/key}
         </div>
       </main>

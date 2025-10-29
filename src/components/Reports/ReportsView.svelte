@@ -3,6 +3,7 @@
   import EmptyState from '../EmptyState.svelte';
   import WeeklyReport from './WeeklyReport.svelte';
   import AuditView from './AuditView.svelte';
+  import ProgressBar from '../ProgressBar.svelte';
 
   // Tab state
   let activeTab = 'daily'; // 'daily', 'weekly', 'audit'
@@ -98,17 +99,26 @@
             </div>
           </div>
 
-          <!-- Task Breakdown -->
+          <!-- Task Breakdown with Visual Progress Bars -->
           {#if $dailyReport.taskBreakdown && $dailyReport.taskBreakdown.length > 0}
             <div class="mt-6">
-              <h3 class="text-lg font-semibold mb-3">Task Breakdown</h3>
-              <div class="space-y-2">
+              <h3 class="text-lg font-semibold mb-4">Task Breakdown</h3>
+              <div class="space-y-4">
                 {#each $dailyReport.taskBreakdown as task (task.taskId)}
-                  <div class="flex justify-between items-center p-3 bg-base-200 rounded-lg">
-                    <span class="font-medium">{task.taskName}</span>
-                    <span class="text-primary font-bold">
-                      {Math.round(((task.totalTime || 0) / (1000 * 60 * 60)) * 100) / 100}h
-                    </span>
+                  {@const taskHours = Math.round(((task.totalTime || 0) / (1000 * 60 * 60)) * 100) / 100}
+                  {@const maxTime = Math.max(...$dailyReport.taskBreakdown.map(t => t.totalTime || 0))}
+                  <div class="p-4 bg-base-200 rounded-lg">
+                    <div class="flex justify-between items-center mb-2">
+                      <span class="font-medium">{task.taskName}</span>
+                      <span class="text-primary font-bold">{taskHours}h</span>
+                    </div>
+                    <ProgressBar
+                      value={task.totalTime || 0}
+                      max={maxTime}
+                      color="primary"
+                      size="md"
+                      showPercentage={false}
+                    />
                   </div>
                 {/each}
               </div>
