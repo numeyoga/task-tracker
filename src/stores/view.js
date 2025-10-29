@@ -70,10 +70,23 @@ export const modalState = writable({
 /**
  * Sidebar state (for mobile/responsive)
  */
+// Load collapsed state from localStorage
+const savedCollapsedState = typeof window !== 'undefined'
+  ? localStorage.getItem('sidebar-collapsed') === 'true'
+  : false;
+
 export const sidebarState = writable({
   isOpen: false,
-  isPinned: true // Desktop default
+  isPinned: true, // Desktop default
+  isCollapsed: savedCollapsedState // Collapsed to 64px vs 256px
 });
+
+// Save collapsed state to localStorage whenever it changes
+if (typeof window !== 'undefined') {
+  sidebarState.subscribe(($state) => {
+    localStorage.setItem('sidebar-collapsed', $state.isCollapsed.toString());
+  });
+}
 
 /**
  * Loading states for different views
@@ -231,6 +244,16 @@ export const viewActions = {
       ...state,
       isPinned: !state.isPinned,
       isOpen: !state.isPinned ? false : state.isOpen
+    }));
+  },
+
+  /**
+   * Toggle sidebar collapsed state (64px vs 256px)
+   */
+  toggleSidebarCollapse() {
+    sidebarState.update((state) => ({
+      ...state,
+      isCollapsed: !state.isCollapsed
     }));
   },
 

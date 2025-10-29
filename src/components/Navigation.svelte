@@ -1,6 +1,7 @@
 <script>
-  import { navigationItems, viewActions, currentViewInfo } from '../stores/view.js';
+  import { navigationItems, viewActions, currentViewInfo, sidebarState } from '../stores/view.js';
   import { timerStatus } from '../stores/timer.js';
+  import { timerActions } from '../stores/timer.js';
 
   // Icons (using simple SVG icons to avoid external dependencies)
   const icons = {
@@ -16,72 +17,151 @@
   function handleNavigation(viewId) {
     viewActions.navigateTo(viewId);
   }
+
+  function handleToggleCollapse() {
+    viewActions.toggleSidebarCollapse();
+  }
+
+  async function handleStopTimer() {
+    try {
+      await timerActions.stopTimer();
+    } catch (error) {
+      console.error('Failed to stop timer:', error);
+    }
+  }
+
+  async function handleStartMealBreak() {
+    try {
+      await timerActions.startMealBreak();
+    } catch (error) {
+      console.error('Failed to start meal break:', error);
+    }
+  }
+
+  async function handleStopMealBreak() {
+    try {
+      await timerActions.stopMealBreak();
+    } catch (error) {
+      console.error('Failed to stop meal break:', error);
+    }
+  }
 </script>
 
 <!-- Navigation Sidebar -->
-<div class="flex flex-col h-full">
+<nav class="flex flex-col h-full" role="navigation" aria-label="Main navigation">
   <!-- Logo/Brand -->
   <div class="p-4 border-b border-base-300">
-    <div class="flex items-center space-x-2">
-      <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-        <svg
-          class="w-4 h-4 text-primary-content"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={icons.timer}
-          ></path>
+    <div class="flex items-center {$sidebarState.isCollapsed ? 'justify-center' : 'justify-between'}">
+      {#if !$sidebarState.isCollapsed}
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+            <svg
+              class="w-4 h-4 text-primary-content"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={icons.timer}
+              ></path>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-lg font-bold text-base-content">Work Timer</h1>
+            <p class="text-xs text-base-content/60">Track your productivity</p>
+          </div>
+        </div>
+      {:else}
+        <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+          <svg
+            class="w-4 h-4 text-primary-content"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={icons.timer}
+            ></path>
+          </svg>
+        </div>
+      {/if}
+      <!-- Toggle Collapse Button -->
+      <button
+        class="btn btn-ghost btn-sm btn-circle"
+        on:click={handleToggleCollapse}
+        aria-label={$sidebarState.isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        aria-expanded={!$sidebarState.isCollapsed}
+        title={$sidebarState.isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          {#if $sidebarState.isCollapsed}
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
+          {:else}
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
+          {/if}
         </svg>
-      </div>
-      <div>
-        <h1 class="text-lg font-bold text-base-content">Work Timer</h1>
-        <p class="text-xs text-base-content/60">Track your productivity</p>
-      </div>
+      </button>
     </div>
   </div>
 
   <!-- Timer Status Display -->
-  {#if $timerStatus.hasActiveTimer}
-    <div class="p-4 bg-primary/10 border-b border-base-300">
-      <div class="flex items-center space-x-3">
-        <div class="w-3 h-3 bg-success rounded-full animate-pulse"></div>
-        <div class="flex-1">
-          <div class="text-sm font-medium text-base-content">Timer Running</div>
-          <div class="text-xs text-base-content/70 truncate">
-            {$timerStatus.currentTaskName}
-          </div>
-          <div class="text-lg font-mono font-bold text-primary">
-            {$timerStatus.formattedElapsed}
+  {#if !$sidebarState.isCollapsed}
+    {#if $timerStatus.hasActiveTimer}
+      <div class="p-4 bg-primary/10 border-b border-base-300">
+        <div class="flex items-center space-x-3">
+          <div class="w-3 h-3 bg-success rounded-full animate-pulse"></div>
+          <div class="flex-1">
+            <div class="text-sm font-medium text-base-content">Timer Running</div>
+            <div class="text-xs text-base-content/70 truncate">
+              {$timerStatus.currentTaskName}
+            </div>
+            <div class="text-lg font-mono font-bold text-primary">
+              {$timerStatus.formattedElapsed}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    {:else}
+      <div class="p-4 bg-base-200/50 border-b border-base-300">
+        <div class="flex items-center space-x-3">
+          <div class="w-3 h-3 bg-base-content/30 rounded-full"></div>
+          <div class="flex-1">
+            <div class="text-sm text-base-content/70">No active timer</div>
+            <div class="text-xs text-base-content/60">Ready to start tracking</div>
+          </div>
+        </div>
+      </div>
+    {/if}
   {:else}
-    <div class="p-4 bg-base-200/50 border-b border-base-300">
-      <div class="flex items-center space-x-3">
-        <div class="w-3 h-3 bg-base-content/30 rounded-full"></div>
-        <div class="flex-1">
-          <div class="text-sm text-base-content/70">No active timer</div>
-          <div class="text-xs text-base-content/60">Ready to start tracking</div>
-        </div>
-      </div>
+    <!-- Collapsed Timer Status - Just indicator dot -->
+    <div class="p-2 border-b border-base-300 flex justify-center">
+      {#if $timerStatus.hasActiveTimer}
+        <div
+          class="w-3 h-3 bg-success rounded-full animate-pulse"
+          title="Timer running: {$timerStatus.formattedElapsed}"
+        ></div>
+      {:else}
+        <div
+          class="w-3 h-3 bg-base-content/30 rounded-full"
+          title="No active timer"
+        ></div>
+      {/if}
     </div>
   {/if}
 
   <!-- Navigation Menu -->
-  <nav class="flex-1 p-3">
-    <ul class="space-y-1">
+  <nav class="flex-1 p-3" aria-label="Main menu">
+    <ul class="space-y-1" role="list">
       {#each $navigationItems as item (item.id)}
         <li>
           <button
-            class="flex items-center space-x-2 w-full text-left p-2 rounded-md transition-colors text-sm {item.isActive
+            class="flex items-center {$sidebarState.isCollapsed ? 'justify-center' : 'space-x-2'} w-full text-left p-2 rounded-md transition-colors text-sm {item.isActive
               ? 'bg-primary text-primary-content'
               : 'hover:bg-base-200'}"
             on:click={() => handleNavigation(item.id)}
             aria-current={item.isActive ? 'page' : undefined}
+            aria-label={$sidebarState.isCollapsed ? item.name : undefined}
+            title={$sidebarState.isCollapsed ? item.name : ''}
           >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -89,7 +169,9 @@
                 d={icons[item.icon]}
               ></path>
             </svg>
-            <span class="font-medium text-sm">{item.name}</span>
+            {#if !$sidebarState.isCollapsed}
+              <span class="font-medium text-sm">{item.name}</span>
+            {/if}
           </button>
         </li>
       {/each}
@@ -97,20 +179,84 @@
   </nav>
 
   <!-- Quick Actions -->
-  <div class="p-3 border-t border-base-300">
-    <div class="text-xs font-semibold text-base-content/60 mb-2 uppercase tracking-wider">
-      Quick Actions
+  {#if !$sidebarState.isCollapsed}
+    <div class="p-3 border-t border-base-300">
+      <div class="text-xs font-semibold text-base-content/60 mb-2 uppercase tracking-wider">
+        Quick Actions
+      </div>
+      <div class="space-y-1">
+        {#if $timerStatus.hasActiveTimer}
+          <button
+            class="btn btn-error btn-xs w-full"
+            on:click={handleStopTimer}
+          >
+            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
+            Stop Timer
+          </button>
+        {:else}
+          <button class="btn btn-primary btn-xs w-full" on:click={() => handleNavigation('timer')}>
+            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h8m-9 4h10a1 1 0 001-1V7a1 1 0 00-1-1H7a1 1 0 00-1 1v10a1 1 0 001 1z"
+              ></path>
+            </svg>
+            Start Timer
+          </button>
+        {/if}
+
+        {#if $timerStatus.hasActiveMealBreak}
+          <button
+            class="btn btn-warning btn-xs w-full"
+            on:click={handleStopMealBreak}
+          >
+            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
+            End Meal Break
+          </button>
+        {:else}
+          <button
+            class="btn btn-outline btn-xs w-full"
+            on:click={handleStartMealBreak}
+          >
+            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              ></path>
+            </svg>
+            Meal Break
+          </button>
+        {/if}
+      </div>
     </div>
-    <div class="space-y-1">
+  {:else}
+    <!-- Collapsed Quick Actions - Icon buttons only -->
+    <div class="p-2 border-t border-base-300 flex flex-col items-center space-y-2">
       {#if $timerStatus.hasActiveTimer}
         <button
-          class="btn btn-error btn-xs w-full"
-          on:click={() => {
-            // This would call timer actions
-            console.log('Stop timer');
-          }}
+          class="btn btn-error btn-sm btn-circle"
+          on:click={handleStopTimer}
+          title="Stop Timer"
         >
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -118,11 +264,14 @@
               d="M6 18L18 6M6 6l12 12"
             ></path>
           </svg>
-          Stop Timer
         </button>
       {:else}
-        <button class="btn btn-primary btn-xs w-full" on:click={() => handleNavigation('timer')}>
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button
+          class="btn btn-primary btn-sm btn-circle"
+          on:click={() => handleNavigation('timer')}
+          title="Start Timer"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -130,18 +279,16 @@
               d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h8m-9 4h10a1 1 0 001-1V7a1 1 0 00-1-1H7a1 1 0 00-1 1v10a1 1 0 001 1z"
             ></path>
           </svg>
-          Start Timer
         </button>
       {/if}
 
       {#if $timerStatus.hasActiveMealBreak}
         <button
-          class="btn btn-warning btn-xs w-full"
-          on:click={() => {
-            console.log('Stop meal break');
-          }}
+          class="btn btn-warning btn-sm btn-circle"
+          on:click={handleStopMealBreak}
+          title="End Meal Break"
         >
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -149,16 +296,14 @@
               d="M6 18L18 6M6 6l12 12"
             ></path>
           </svg>
-          End Meal Break
         </button>
       {:else}
         <button
-          class="btn btn-outline btn-xs w-full"
-          on:click={() => {
-            console.log('Start meal break');
-          }}
+          class="btn btn-outline btn-sm btn-circle"
+          on:click={handleStartMealBreak}
+          title="Start Meal Break"
         >
-          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -166,19 +311,20 @@
               d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
             ></path>
           </svg>
-          Meal Break
         </button>
       {/if}
     </div>
-  </div>
+  {/if}
 
   <!-- Footer Info -->
-  <div class="p-3 border-t border-base-300 text-center">
-    <div class="text-xs text-base-content/60">Work Timer v1.0</div>
-    <div class="text-xs text-base-content/60 mt-1">
-      {$currentViewInfo.name}
+  {#if !$sidebarState.isCollapsed}
+    <div class="p-3 border-t border-base-300 text-center">
+      <div class="text-xs text-base-content/60">Work Timer v1.0</div>
+      <div class="text-xs text-base-content/60 mt-1">
+        {$currentViewInfo.name}
+      </div>
     </div>
-  </div>
+  {/if}
 </div>
 
 <style>

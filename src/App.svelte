@@ -1,7 +1,7 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
   import { initializeStores, destroyStores } from './stores/index.js';
-  import { currentView, viewActions } from './stores/view.js';
+  import { currentView, viewActions, sidebarState } from './stores/view.js';
   import { timerState, timerActions, timerError } from './stores/timer.js';
   import { activeTask, allTasks, taskActions, tasksError } from './stores/tasks.js';
   import { settingsError } from './stores/settings.js';
@@ -10,6 +10,7 @@
   // Import main layout components
   import Navigation from './components/Navigation.svelte';
   import ErrorNotification from './components/ErrorNotification.svelte';
+  import SmoothTransition from './components/SmoothTransition.svelte';
 
   // Import view components
   import TimerView from './components/Timer/TimerView.svelte';
@@ -312,7 +313,7 @@
     <!-- Main Application Layout - Desktop Only -->
     <div class="flex min-h-screen">
       <!-- Sidebar Navigation -->
-      <aside class="w-64 bg-base-100 border-r border-base-300 flex-shrink-0">
+      <aside class="{$sidebarState.isCollapsed ? 'w-16' : 'w-64'} bg-base-100 border-r border-base-300 flex-shrink-0 transition-all duration-300">
         <Navigation />
       </aside>
 
@@ -320,9 +321,11 @@
       <main class="flex-1 bg-base-200 min-w-0">
         <div class="p-6 max-w-7xl">
           {#key $currentView}
-            <div class="view-transition">
-              <svelte:component this={CurrentViewComponent} />
-            </div>
+            <SmoothTransition duration={300}>
+              <div class="view-transition">
+                <svelte:component this={CurrentViewComponent} />
+              </div>
+            </SmoothTransition>
           {/key}
         </div>
       </main>

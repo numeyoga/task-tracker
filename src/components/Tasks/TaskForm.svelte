@@ -219,11 +219,12 @@
           >
             Cancel
           </button>
-          <button type="submit" class="btn btn-primary" disabled={!isValid || isSubmitting}>
+          <button type="submit" class="btn btn-primary gap-2" disabled={!isValid || isSubmitting}>
             {#if isSubmitting}
               <span class="loading loading-spinner loading-sm"></span>
+              <span>Saving...</span>
             {:else}
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -231,8 +232,8 @@
                   d="M5 13l4 4L19 7"
                 ></path>
               </svg>
+              <span>{submitLabel}</span>
             {/if}
-            {submitLabel}
           </button>
         </div>
       </form>

@@ -206,22 +206,36 @@ All spacing uses a consistent 4px base unit scale.
 
 A consistent icon sizing system ensures visual hierarchy.
 
-### Icon Size Scale
+### Icon Size Scale (Phase 2 Standardized)
 
-| Size | Token | Tailwind | Usage |
-|------|-------|----------|-------|
-| 12px | `--icon-xs` | `w-3 h-3` | Inline icons, badges, btn-xs |
-| 16px | `--icon-sm` | `w-4 h-4` | Navigation, secondary buttons, form controls |
-| 20px | `--icon-md` | `w-5 h-5` | Section headers, notifications, card titles |
-| 24px | `--icon-lg` | `w-6 h-6` | Primary action buttons (btn-lg) |
-| 32px | `--icon-xl` | `w-8 h-8` | Hero sections, empty states |
+| Size | Token | Tailwind | Usage | Examples |
+|------|-------|----------|-------|----------|
+| 12px | `--icon-xs` | `w-3 h-3` | Inline icons, badges, btn-xs | Delete, Archive icons in compact buttons |
+| 16px | `--icon-sm` | `w-4 h-4` | Navigation, secondary buttons, form controls | Nav items, Edit/Close buttons, Checkboxes |
+| 20px | `--icon-md` | `w-5 h-5` | Section headers, notifications, alerts, card titles | Alert icons, Section headings, Modal headers |
+| 24px | `--icon-lg` | `w-6 h-6` | Primary action buttons (btn-lg), emphasized actions | Start/Stop Timer, Primary CTAs |
+| 32px | `--icon-xl` | `w-8 h-8` | Hero sections, large empty states | App logo, Large icons |
+| 64px | `--icon-2xl` | `w-16 h-16` | Empty state illustrations | No tasks, No data screens |
 
-### Icon Usage by Context
+### Icon Usage by Context (Phase 2 Rules)
+
+**STRICT RULES - Always Follow:**
+
+1. **btn-lg + Primary Action** → `w-5 h-5` (NOT w-6!)
+2. **btn (regular)** → `w-4 h-4`
+3. **btn-sm** → `w-4 h-4`
+4. **btn-xs** → `w-3 h-3`
+5. **Navigation items** → `w-4 h-4`
+6. **Alerts/Notifications** → `w-5 h-5`
+7. **Empty States** → `w-16 h-16`
+8. **Close buttons in modals** → `w-4 h-4`
 
 ```svelte
-<!-- Primary Action Button (Start Timer) -->
-<button class="btn btn-lg btn-primary">
-  <svg class="w-6 h-6 mr-2">...</svg>
+<!-- ✅ CORRECT - Phase 2 Standard -->
+
+<!-- Primary Action Button (btn-lg) -->
+<button class="btn btn-lg btn-primary gap-2">
+  <svg class="w-5 h-5">...</svg>  <!-- 20px, not 24px! -->
   Start Timer
 </button>
 
@@ -238,13 +252,52 @@ A consistent icon sizing system ensures visual hierarchy.
 </button>
 
 <!-- Small Button -->
-<button class="btn btn-xs">
-  <svg class="w-3 h-3 mr-1">...</svg>
+<button class="btn btn-sm">
+  <svg class="w-4 h-4">...</svg>  <!-- Still w-4, not w-3 -->
   Edit
 </button>
 
+<!-- Extra Small Button -->
+<button class="btn btn-xs">
+  <svg class="w-3 h-3 mr-1">...</svg>
+  Delete
+</button>
+
+<!-- Alert/Error Message -->
+<div class="alert alert-error">
+  <svg class="w-5 h-5">...</svg>  <!-- Always w-5 for alerts -->
+  <span>Error message</span>
+</div>
+
 <!-- Empty State Icon -->
-<svg class="w-16 h-16 mx-auto">...</svg>
+<svg class="w-16 h-16 mx-auto text-base-content/30">...</svg>
+
+<!-- ❌ INCORRECT - Don't do this! -->
+<button class="btn btn-lg">
+  <svg class="w-6 h-6">...</svg>  <!-- Too big! Use w-5 -->
+</button>
+
+<button class="btn btn-sm">
+  <svg class="w-3 h-3">...</svg>  <!-- Too small! Use w-4 -->
+</button>
+```
+
+### Icon Spacing Rules
+
+Use `gap-2` (8px) or `mr-2` for spacing between icon and text:
+
+```svelte
+<!-- ✅ Modern: Using gap (preferred) -->
+<button class="btn gap-2">
+  <svg class="w-4 h-4">...</svg>
+  Button Text
+</button>
+
+<!-- ✅ Legacy: Using margin (acceptable) -->
+<button class="btn">
+  <svg class="w-4 h-4 mr-2">...</svg>
+  Button Text
+</button>
 ```
 
 ---
@@ -476,45 +529,164 @@ All interactive elements must have visible focus states:
 
 ```css
 *:focus-visible {
-  outline: var(--focus-ring-width) solid var(--focus-ring-color);
-  outline-offset: var(--focus-ring-offset);
+  outline: 2px solid hsl(var(--p));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Enhanced focus states for buttons */
+.btn:focus-visible {
+  outline: 2px solid hsl(var(--p));
+  outline-offset: 2px;
+}
+
+/* Focus states for inputs */
+.input:focus-visible,
+.select:focus-visible,
+.textarea:focus-visible {
+  outline: 2px solid hsl(var(--p));
+  outline-offset: 0;
+  border-color: hsl(var(--p));
 }
 ```
 
 ### Color Contrast
 
-- **Body text**: Minimum AA contrast (4.5:1)
-- **Large text**: Minimum AA contrast (3:1)
-- **UI elements**: Minimum AA contrast (3:1)
+- **Body text**: Minimum WCAG AA contrast (4.5:1)
+- **Large text**: Minimum WCAG AA contrast (3:1)
+- **UI elements**: Minimum WCAG AA contrast (3:1)
 
 **Opacity Guidelines:**
-- Avoid using less than 60% opacity for text
-- Use `text-base-content/70` or higher for secondary text
-- Never use `text-base-content/50` for important information
+- ✅ Use `text-base-content/70` or higher for secondary text
+- ✅ Use `text-base-content/60` for tertiary text (labels, captions)
+- ❌ Never use `text-base-content/50` for important information
+- ❌ Never use less than 60% opacity for interactive elements
 
 ### ARIA Labels
 
-Always provide proper ARIA labels:
+Always provide proper ARIA labels for icon-only buttons and interactive elements:
 
 ```svelte
+<!-- ✅ CORRECT: Icon button with aria-label -->
 <button
   class="btn btn-circle btn-ghost"
   aria-label="Close modal"
+  title="Close modal"
 >
-  <svg>...</svg>
+  <svg class="w-4 h-4">...</svg>
 </button>
 
+<!-- ✅ CORRECT: Navigation with aria-label -->
 <nav aria-label="Main navigation">
-  <!-- Navigation items -->
+  <button aria-label="Timer view" aria-current={isActive ? 'page' : undefined}>
+    <svg class="w-4 h-4">...</svg>
+    <span>Timer</span>
+  </button>
 </nav>
+
+<!-- ✅ CORRECT: Form with labels -->
+<div class="form-control">
+  <label for="task-name" class="label">
+    <span class="label-text">Task Name</span>
+  </label>
+  <input
+    id="task-name"
+    type="text"
+    class="input input-bordered"
+    aria-required="true"
+    aria-invalid={hasError ? 'true' : 'false'}
+    aria-describedby={hasError ? 'task-name-error' : undefined}
+  />
+  {#if hasError}
+    <span id="task-name-error" class="label-text-alt text-error" role="alert">
+      {errorMessage}
+    </span>
+  {/if}
+</div>
+
+<!-- ❌ INCORRECT: No aria-label on icon-only button -->
+<button class="btn btn-circle">
+  <svg>...</svg>
+</button>
+```
+
+### ARIA Live Regions
+
+Use for dynamic content updates:
+
+```svelte
+<!-- Timer updates -->
+<div aria-live="polite" aria-atomic="true">
+  {formattedElapsed}
+</div>
+
+<!-- Error notifications -->
+<div role="alert" aria-live="assertive">
+  {errorMessage}
+</div>
+
+<!-- Status updates -->
+<div role="status" aria-live="polite">
+  Task completed successfully
+</div>
 ```
 
 ### Keyboard Navigation
 
 - All interactive elements must be keyboard accessible
-- Maintain logical tab order
+- Maintain logical tab order (use `tabindex="0"` for custom controls)
 - Provide keyboard shortcuts for common actions
 - Display shortcuts in tooltips or help modal
+- Trap focus in modals (use `inert` attribute on background)
+
+**Keyboard Shortcut Examples:**
+```svelte
+<!-- Modal with focus trap -->
+<div class="modal modal-open" role="dialog" aria-labelledby="modal-title">
+  <div class="modal-box" on:keydown={handleKeydown}>
+    <h3 id="modal-title" class="font-bold text-lg">Modal Title</h3>
+    <!-- Content -->
+    <button on:click={handleClose} aria-label="Close modal">
+      Close (Esc)
+    </button>
+  </div>
+  <!-- Inert background -->
+  <div class="modal-backdrop" inert></div>
+</div>
+```
+
+### Screen Reader Support
+
+**Best Practices:**
+- Use semantic HTML (`<button>`, `<nav>`, `<main>`, `<header>`)
+- Provide alt text for images
+- Use `aria-describedby` for additional context
+- Use `role` attributes when semantic HTML isn't available
+- Test with NVDA, JAWS, or VoiceOver
+
+**Common Patterns:**
+```svelte
+<!-- Loading state -->
+<button disabled aria-busy="true">
+  <span class="loading loading-spinner" aria-hidden="true"></span>
+  <span>Loading...</span>
+</button>
+
+<!-- Progress indicator -->
+<div role="progressbar" aria-valuenow={progress} aria-valuemin="0" aria-valuemax="100">
+  {progress}% complete
+</div>
+
+<!-- Tab navigation -->
+<div role="tablist" aria-label="Report types">
+  <button role="tab" aria-selected={activeTab === 'daily'} aria-controls="daily-panel">
+    Daily Report
+  </button>
+</div>
+<div id="daily-panel" role="tabpanel" aria-labelledby="daily-tab">
+  <!-- Content -->
+</div>
+```
 
 ---
 
@@ -660,4 +832,5 @@ Use the z-index scale to manage layering:
 ---
 
 **Last Updated**: 2025-10-29
-**Version**: 1.0.0
+**Version**: 2.0.0 (Phase 1 + Phase 2 Complete)
+**Changes**: Added comprehensive accessibility guidelines, icon standardization rules Phase 2, ARIA patterns, and screen reader support documentation.
