@@ -48,7 +48,7 @@
 </script>
 
 <!-- Navigation Sidebar -->
-<nav class="flex flex-col h-full" aria-label="Main navigation">
+<nav class="flex flex-col h-full" role="navigation" aria-label="Main navigation">
   <!-- Logo/Brand -->
   <div class="p-4 border-b border-base-300">
     <div class="flex items-center {$sidebarState.isCollapsed ? 'justify-center' : 'justify-between'}">
