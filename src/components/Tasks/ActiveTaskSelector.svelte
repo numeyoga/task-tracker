@@ -254,7 +254,7 @@
   <!-- Keyboard shortcuts help -->
   {#if showLabel && dropdownOpen}
     <label class="label">
-      <span class="label-text-alt text-base-content/50">
+      <span class="label-text-alt text-base-content/60">
         Use <kbd class="kbd kbd-xs">↑</kbd> <kbd class="kbd kbd-xs">↓</kbd> to navigate,
         <kbd class="kbd kbd-xs">Enter</kbd> to select
       </span>

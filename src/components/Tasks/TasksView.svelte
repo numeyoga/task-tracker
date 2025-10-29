@@ -1,5 +1,6 @@
 <script>
   import { allTasks } from '../../stores/tasks.js';
+  import EmptyState from '../EmptyState.svelte';
 </script>
 
 <div class="max-w-4xl mx-auto space-y-6">
@@ -22,24 +23,13 @@
   <div class="card bg-base-100 shadow-xl">
     <div class="card-body">
       {#if $allTasks.length === 0}
-        <div class="text-center py-12">
-          <svg
-            class="w-16 h-16 mx-auto text-base-content/30 mb-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            ></path>
-          </svg>
-          <h3 class="text-lg font-semibold text-base-content mb-2">No Tasks Yet</h3>
-          <p class="text-base-content/70 mb-4">Create your first task to start tracking time</p>
-          <button class="btn btn-primary">Create Task</button>
-        </div>
+        <EmptyState
+          icon="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          title="No Tasks Yet"
+          description="Create your first task to start tracking time"
+          actionText="Create Task"
+          actionVariant="primary"
+        />
       {:else}
         <div class="space-y-3">
           {#each $allTasks as task (task.id)}

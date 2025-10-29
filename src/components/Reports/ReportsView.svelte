@@ -1,5 +1,6 @@
 <script>
   import { selectedDate, dailyReport } from '../../stores/reports.js';
+  import EmptyState from '../EmptyState.svelte';
 
   // Initialize with today's date
   $: if (!$selectedDate) {
@@ -83,23 +84,11 @@
           </div>
         {/if}
       {:else}
-        <div class="text-center py-12">
-          <svg
-            class="w-16 h-16 mx-auto text-base-content/30 mb-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2z"
-            ></path>
-          </svg>
-          <h3 class="text-lg font-semibold text-base-content mb-2">No Data Available</h3>
-          <p class="text-base-content/70">No work time recorded for this date</p>
-        </div>
+        <EmptyState
+          icon="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+          title="No Data Available"
+          description="No work time recorded for this date"
+        />
       {/if}
     </div>
   </div>

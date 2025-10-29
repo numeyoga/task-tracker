@@ -63,7 +63,7 @@
         <div class="w-3 h-3 bg-base-content/30 rounded-full"></div>
         <div class="flex-1">
           <div class="text-sm text-base-content/70">No active timer</div>
-          <div class="text-xs text-base-content/50">Ready to start tracking</div>
+          <div class="text-xs text-base-content/60">Ready to start tracking</div>
         </div>
       </div>
     </div>
@@ -98,7 +98,7 @@
 
   <!-- Quick Actions -->
   <div class="p-3 border-t border-base-300">
-    <div class="text-xs font-semibold text-base-content/50 mb-2 uppercase tracking-wider">
+    <div class="text-xs font-semibold text-base-content/60 mb-2 uppercase tracking-wider">
       Quick Actions
     </div>
     <div class="space-y-1">
@@ -174,8 +174,8 @@
 
   <!-- Footer Info -->
   <div class="p-3 border-t border-base-300 text-center">
-    <div class="text-xs text-base-content/50">Work Timer v1.0</div>
-    <div class="text-xs text-base-content/40 mt-1">
+    <div class="text-xs text-base-content/60">Work Timer v1.0</div>
+    <div class="text-xs text-base-content/60 mt-1">
       {$currentViewInfo.name}
     </div>
   </div>
