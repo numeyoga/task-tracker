@@ -217,30 +217,15 @@ svg {
   }
 
   /* Consistent icon sizing throughout the app */
+  /*
+   * Icon Size System:
+   * - w-6 h-6 (1.5rem / 24px): Primary action buttons (Start/Stop Timer)
+   * - w-5 h-5 (1.25rem / 20px): Section headers, primary buttons, main notifications
+   * - w-4 h-4 (1rem / 16px): Navigation items, secondary buttons, form controls, close buttons
+   * - w-3 h-3 (0.75rem / 12px): btn-xs, badges, compact indicators, inline icons
+   */
   svg {
     flex-shrink: 0;
-  }
-
-  /* Override any oversized icons */
-  .btn svg {
-    width: 1rem !important;
-    height: 1rem !important;
-  }
-
-  .btn-xs svg {
-    width: 0.75rem !important;
-    height: 0.75rem !important;
-  }
-
-  .btn-sm svg {
-    width: 1rem !important;
-    height: 1rem !important;
-  }
-
-  /* Navigation specific icons */
-  nav svg {
-    width: 1rem !important;
-    height: 1rem !important;
   }
 }
 
