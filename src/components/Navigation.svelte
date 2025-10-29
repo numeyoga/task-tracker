@@ -48,7 +48,7 @@
 </script>
 
 <!-- Navigation Sidebar -->
-<nav class="flex flex-col h-full" role="navigation" aria-label="Main navigation">
+<nav class="flex flex-col h-full" aria-label="Main navigation">
   <!-- Logo/Brand -->
   <div class="p-4 border-b border-base-300">
     <div class="flex items-center {$sidebarState.isCollapsed ? 'justify-center' : 'justify-between'}">
@@ -254,6 +254,7 @@
         <button
           class="btn btn-error btn-sm btn-circle"
           on:click={handleStopTimer}
+          aria-label="Stop Timer"
           title="Stop Timer"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -269,6 +270,7 @@
         <button
           class="btn btn-primary btn-sm btn-circle"
           on:click={() => handleNavigation('timer')}
+          aria-label="Start Timer"
           title="Start Timer"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -286,6 +288,7 @@
         <button
           class="btn btn-warning btn-sm btn-circle"
           on:click={handleStopMealBreak}
+          aria-label="End Meal Break"
           title="End Meal Break"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -301,6 +304,7 @@
         <button
           class="btn btn-outline btn-sm btn-circle"
           on:click={handleStartMealBreak}
+          aria-label="Start Meal Break"
           title="Start Meal Break"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -325,19 +329,5 @@
       </div>
     </div>
   {/if}
-</div>
+</nav>
 
-<style>
-  .menu li button {
-    border-radius: 8px;
-    transition: all 0.2s ease;
-  }
-
-  .menu li button:hover {
-    transform: translateY(-1px);
-  }
-
-  .menu li button[aria-current='page'] {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-</style>

@@ -1,5 +1,5 @@
 <script>
-  import { selectedDate, dailyReport, reportActions } from '../../stores/reports.js';
+  import { selectedDate, dailyReport } from '../../stores/reports.js';
   import EmptyState from '../EmptyState.svelte';
   import WeeklyReport from './WeeklyReport.svelte';
   import AuditView from './AuditView.svelte';
