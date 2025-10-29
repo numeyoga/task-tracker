@@ -45,7 +45,10 @@
           {#each $allTasks as task (task.id)}
             <div class="flex items-center justify-between p-4 border border-base-300 rounded-lg">
               <div class="flex items-center space-x-3">
-                <div class="w-4 h-4 rounded-full bg-{task.color || 'primary'}"></div>
+                <div
+                  class="w-4 h-4 rounded-full"
+                  style="background-color: {task.color || 'hsl(var(--p))'}"
+                ></div>
                 <div>
                   <div class="font-semibold">{task.name}</div>
                   <div class="text-sm text-base-content/70">

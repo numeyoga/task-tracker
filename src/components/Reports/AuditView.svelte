@@ -61,7 +61,10 @@
                   <td>{entry.date || new Date(entry.startTime).toISOString().split('T')[0]}</td>
                   <td>
                     <div class="flex items-center space-x-2">
-                      <div class="w-3 h-3 rounded-full bg-{entry.taskColor || 'primary'}"></div>
+                      <div
+                        class="w-3 h-3 rounded-full"
+                        style="background-color: {entry.taskColor || 'hsl(var(--p))'}"
+                      ></div>
                       <span>{entry.taskName}</span>
                     </div>
                   </td>
