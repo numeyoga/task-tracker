@@ -206,22 +206,36 @@ All spacing uses a consistent 4px base unit scale.
 
 A consistent icon sizing system ensures visual hierarchy.
 
-### Icon Size Scale
+### Icon Size Scale (Phase 2 Standardized)
 
-| Size | Token | Tailwind | Usage |
-|------|-------|----------|-------|
-| 12px | `--icon-xs` | `w-3 h-3` | Inline icons, badges, btn-xs |
-| 16px | `--icon-sm` | `w-4 h-4` | Navigation, secondary buttons, form controls |
-| 20px | `--icon-md` | `w-5 h-5` | Section headers, notifications, card titles |
-| 24px | `--icon-lg` | `w-6 h-6` | Primary action buttons (btn-lg) |
-| 32px | `--icon-xl` | `w-8 h-8` | Hero sections, empty states |
+| Size | Token | Tailwind | Usage | Examples |
+|------|-------|----------|-------|----------|
+| 12px | `--icon-xs` | `w-3 h-3` | Inline icons, badges, btn-xs | Delete, Archive icons in compact buttons |
+| 16px | `--icon-sm` | `w-4 h-4` | Navigation, secondary buttons, form controls | Nav items, Edit/Close buttons, Checkboxes |
+| 20px | `--icon-md` | `w-5 h-5` | Section headers, notifications, alerts, card titles | Alert icons, Section headings, Modal headers |
+| 24px | `--icon-lg` | `w-6 h-6` | Primary action buttons (btn-lg), emphasized actions | Start/Stop Timer, Primary CTAs |
+| 32px | `--icon-xl` | `w-8 h-8` | Hero sections, large empty states | App logo, Large icons |
+| 64px | `--icon-2xl` | `w-16 h-16` | Empty state illustrations | No tasks, No data screens |
 
-### Icon Usage by Context
+### Icon Usage by Context (Phase 2 Rules)
+
+**STRICT RULES - Always Follow:**
+
+1. **btn-lg + Primary Action** → `w-5 h-5` (NOT w-6!)
+2. **btn (regular)** → `w-4 h-4`
+3. **btn-sm** → `w-4 h-4`
+4. **btn-xs** → `w-3 h-3`
+5. **Navigation items** → `w-4 h-4`
+6. **Alerts/Notifications** → `w-5 h-5`
+7. **Empty States** → `w-16 h-16`
+8. **Close buttons in modals** → `w-4 h-4`
 
 ```svelte
-<!-- Primary Action Button (Start Timer) -->
-<button class="btn btn-lg btn-primary">
-  <svg class="w-6 h-6 mr-2">...</svg>
+<!-- ✅ CORRECT - Phase 2 Standard -->
+
+<!-- Primary Action Button (btn-lg) -->
+<button class="btn btn-lg btn-primary gap-2">
+  <svg class="w-5 h-5">...</svg>  <!-- 20px, not 24px! -->
   Start Timer
 </button>
 
@@ -238,13 +252,52 @@ A consistent icon sizing system ensures visual hierarchy.
 </button>
 
 <!-- Small Button -->
-<button class="btn btn-xs">
-  <svg class="w-3 h-3 mr-1">...</svg>
+<button class="btn btn-sm">
+  <svg class="w-4 h-4">...</svg>  <!-- Still w-4, not w-3 -->
   Edit
 </button>
 
+<!-- Extra Small Button -->
+<button class="btn btn-xs">
+  <svg class="w-3 h-3 mr-1">...</svg>
+  Delete
+</button>
+
+<!-- Alert/Error Message -->
+<div class="alert alert-error">
+  <svg class="w-5 h-5">...</svg>  <!-- Always w-5 for alerts -->
+  <span>Error message</span>
+</div>
+
 <!-- Empty State Icon -->
-<svg class="w-16 h-16 mx-auto">...</svg>
+<svg class="w-16 h-16 mx-auto text-base-content/30">...</svg>
+
+<!-- ❌ INCORRECT - Don't do this! -->
+<button class="btn btn-lg">
+  <svg class="w-6 h-6">...</svg>  <!-- Too big! Use w-5 -->
+</button>
+
+<button class="btn btn-sm">
+  <svg class="w-3 h-3">...</svg>  <!-- Too small! Use w-4 -->
+</button>
+```
+
+### Icon Spacing Rules
+
+Use `gap-2` (8px) or `mr-2` for spacing between icon and text:
+
+```svelte
+<!-- ✅ Modern: Using gap (preferred) -->
+<button class="btn gap-2">
+  <svg class="w-4 h-4">...</svg>
+  Button Text
+</button>
+
+<!-- ✅ Legacy: Using margin (acceptable) -->
+<button class="btn">
+  <svg class="w-4 h-4 mr-2">...</svg>
+  Button Text
+</button>
 ```
 
 ---

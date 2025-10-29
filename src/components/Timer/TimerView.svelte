@@ -5,6 +5,12 @@
   // Timer display components would go here - for now using inline implementation
   let selectedTaskId = null;
 
+  // Loading states
+  let isStarting = false;
+  let isStopping = false;
+  let isMealStarting = false;
+  let isMealStopping = false;
+
   // Initialize with active task if available
   $: if ($activeTask && !selectedTaskId) {
     selectedTaskId = $activeTask.id;
@@ -17,33 +23,45 @@
     }
 
     try {
+      isStarting = true;
       await timerActions.startTimer(selectedTaskId);
     } catch (error) {
       console.error('Failed to start timer:', error);
+    } finally {
+      isStarting = false;
     }
   }
 
   async function stopTimer() {
     try {
+      isStopping = true;
       await timerActions.stopTimer();
     } catch (error) {
       console.error('Failed to stop timer:', error);
+    } finally {
+      isStopping = false;
     }
   }
 
   async function startMealBreak() {
     try {
+      isMealStarting = true;
       await timerActions.startMealBreak();
     } catch (error) {
       console.error('Failed to start meal break:', error);
+    } finally {
+      isMealStarting = false;
     }
   }
 
   async function stopMealBreak() {
     try {
+      isMealStopping = true;
       await timerActions.stopMealBreak();
     } catch (error) {
       console.error('Failed to stop meal break:', error);
+    } finally {
+      isMealStopping = false;
     }
   }
 </script>
@@ -129,22 +147,32 @@
       <!-- Timer Controls -->
       <div class="flex justify-center space-x-3">
         {#if $timerState.isRunning}
-          <button class="btn btn-error btn-lg gap-2" on:click={stopTimer}>
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <rect x="6" y="6" width="12" height="12" rx="2"></rect>
-            </svg>
-            Stop Timer
+          <button class="btn btn-error btn-lg gap-2" on:click={stopTimer} disabled={isStopping}>
+            {#if isStopping}
+              <span class="loading loading-spinner loading-sm"></span>
+              <span>Stopping...</span>
+            {:else}
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <rect x="6" y="6" width="12" height="12" rx="2"></rect>
+              </svg>
+              <span>Stop Timer</span>
+            {/if}
           </button>
         {:else}
           <button
             class="btn btn-primary btn-lg gap-2"
             on:click={startTimer}
-            disabled={!selectedTaskId}
+            disabled={!selectedTaskId || isStarting}
           >
-            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z"></path>
-            </svg>
-            Start Timer
+            {#if isStarting}
+              <span class="loading loading-spinner loading-sm"></span>
+              <span>Starting...</span>
+            {:else}
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"></path>
+              </svg>
+              <span>Start Timer</span>
+            {/if}
           </button>
         {/if}
       </div>
@@ -180,9 +208,23 @@
 
         <div>
           {#if $mealBreakState.isRunning}
-            <button class="btn btn-warning" on:click={stopMealBreak}> End Break </button>
+            <button class="btn btn-warning gap-2" on:click={stopMealBreak} disabled={isMealStopping}>
+              {#if isMealStopping}
+                <span class="loading loading-spinner loading-sm"></span>
+                Ending...
+              {:else}
+                End Break
+              {/if}
+            </button>
           {:else}
-            <button class="btn btn-outline" on:click={startMealBreak}> Start Meal Break </button>
+            <button class="btn btn-outline gap-2" on:click={startMealBreak} disabled={isMealStarting}>
+              {#if isMealStarting}
+                <span class="loading loading-spinner loading-sm"></span>
+                Starting...
+              {:else}
+                Start Meal Break
+              {/if}
+            </button>
           {/if}
         </div>
       </div>

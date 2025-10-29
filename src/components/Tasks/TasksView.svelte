@@ -9,6 +9,10 @@
   let selectedTask = null;
   let errorMessage = null;
 
+  // Loading states
+  let deletingTaskId = null;
+  let archivingTaskId = null;
+
   function handleNewTask() {
     modalMode = 'create';
     selectedTask = null;
@@ -51,23 +55,29 @@
     }
 
     try {
+      deletingTaskId = task.id;
       await taskActions.deleteTask(task.id);
     } catch (error) {
       errorMessage = error.message;
       setTimeout(() => {
         errorMessage = null;
       }, 5000);
+    } finally {
+      deletingTaskId = null;
     }
   }
 
   async function handleArchiveTask(task) {
     try {
+      archivingTaskId = task.id;
       await taskActions.updateTask(task.id, { isArchived: !task.isArchived });
     } catch (error) {
       errorMessage = error.message;
       setTimeout(() => {
         errorMessage = null;
       }, 5000);
+    } finally {
+      archivingTaskId = null;
     }
   }
 
@@ -158,29 +168,39 @@
                   class="btn btn-ghost btn-sm"
                   on:click={() => handleArchiveTask(task)}
                   title="Archive task"
+                  disabled={archivingTaskId === task.id}
                 >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
-                    ></path>
-                  </svg>
+                  {#if archivingTaskId === task.id}
+                    <span class="loading loading-spinner loading-xs"></span>
+                  {:else}
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+                      ></path>
+                    </svg>
+                  {/if}
                 </button>
                 <button
                   class="btn btn-ghost btn-sm text-error"
                   on:click={() => handleDeleteTask(task)}
                   title="Delete task"
+                  disabled={deletingTaskId === task.id}
                 >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    ></path>
-                  </svg>
+                  {#if deletingTaskId === task.id}
+                    <span class="loading loading-spinner loading-xs"></span>
+                  {:else}
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      ></path>
+                    </svg>
+                  {/if}
                 </button>
               </div>
             </div>
@@ -208,29 +228,39 @@
                     class="btn btn-ghost btn-sm"
                     on:click={() => handleArchiveTask(task)}
                     title="Restore task"
+                    disabled={archivingTaskId === task.id}
                   >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                      ></path>
-                    </svg>
+                    {#if archivingTaskId === task.id}
+                      <span class="loading loading-spinner loading-xs"></span>
+                    {:else}
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                        ></path>
+                      </svg>
+                    {/if}
                   </button>
                   <button
                     class="btn btn-ghost btn-sm text-error"
                     on:click={() => handleDeleteTask(task)}
                     title="Delete permanently"
+                    disabled={deletingTaskId === task.id}
                   >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      ></path>
-                    </svg>
+                    {#if deletingTaskId === task.id}
+                      <span class="loading loading-spinner loading-xs"></span>
+                    {:else}
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        ></path>
+                      </svg>
+                    {/if}
                   </button>
                 </div>
               </div>
