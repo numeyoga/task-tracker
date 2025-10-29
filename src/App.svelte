@@ -1,7 +1,7 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
   import { initializeStores, destroyStores } from './stores/index.js';
-  import { currentView, viewActions } from './stores/view.js';
+  import { currentView, viewActions, sidebarState } from './stores/view.js';
   import { timerState, timerActions, timerError } from './stores/timer.js';
   import { activeTask, allTasks, taskActions, tasksError } from './stores/tasks.js';
   import { settingsError } from './stores/settings.js';
@@ -312,7 +312,7 @@
     <!-- Main Application Layout - Desktop Only -->
     <div class="flex min-h-screen">
       <!-- Sidebar Navigation -->
-      <aside class="w-64 bg-base-100 border-r border-base-300 flex-shrink-0">
+      <aside class="{$sidebarState.isCollapsed ? 'w-16' : 'w-64'} bg-base-100 border-r border-base-300 flex-shrink-0 transition-all duration-300">
         <Navigation />
       </aside>
 
