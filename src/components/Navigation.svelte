@@ -48,7 +48,7 @@
 </script>
 
 <!-- Navigation Sidebar -->
-<div class="flex flex-col h-full">
+<nav class="flex flex-col h-full" role="navigation" aria-label="Main navigation">
   <!-- Logo/Brand -->
   <div class="p-4 border-b border-base-300">
     <div class="flex items-center {$sidebarState.isCollapsed ? 'justify-center' : 'justify-between'}">
@@ -88,9 +88,10 @@
         class="btn btn-ghost btn-sm btn-circle"
         on:click={handleToggleCollapse}
         aria-label={$sidebarState.isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        aria-expanded={!$sidebarState.isCollapsed}
         title={$sidebarState.isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
       >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           {#if $sidebarState.isCollapsed}
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
           {:else}
@@ -147,8 +148,8 @@
   {/if}
 
   <!-- Navigation Menu -->
-  <nav class="flex-1 p-3">
-    <ul class="space-y-1">
+  <nav class="flex-1 p-3" aria-label="Main menu">
+    <ul class="space-y-1" role="list">
       {#each $navigationItems as item (item.id)}
         <li>
           <button
@@ -157,9 +158,10 @@
               : 'hover:bg-base-200'}"
             on:click={() => handleNavigation(item.id)}
             aria-current={item.isActive ? 'page' : undefined}
+            aria-label={$sidebarState.isCollapsed ? item.name : undefined}
             title={$sidebarState.isCollapsed ? item.name : ''}
           >
-            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
