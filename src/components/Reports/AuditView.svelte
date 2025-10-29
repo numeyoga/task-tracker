@@ -1,5 +1,6 @@
 <script>
   import { auditData, reportActions } from '../../stores/reports.js';
+  import EmptyState from '../EmptyState.svelte';
 </script>
 
 <div class="max-w-6xl mx-auto space-y-6">
@@ -61,7 +62,10 @@
                   <td>{entry.date || new Date(entry.startTime).toISOString().split('T')[0]}</td>
                   <td>
                     <div class="flex items-center space-x-2">
-                      <div class="w-3 h-3 rounded-full bg-{entry.taskColor || 'primary'}"></div>
+                      <div
+                        class="w-3 h-3 rounded-full"
+                        style="background-color: {entry.taskColor || 'hsl(var(--p))'}"
+                      ></div>
                       <span>{entry.taskName}</span>
                     </div>
                   </td>
@@ -105,26 +109,14 @@
           </div>
         </div>
       {:else}
-        <div class="text-center py-12">
-          <svg
-            class="w-16 h-16 mx-auto text-base-content/30 mb-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            ></path>
-          </svg>
-          <h3 class="text-lg font-semibold text-base-content mb-2">No Audit Data</h3>
-          <p class="text-base-content/70 mb-4">Start tracking time to see your work history here</p>
-          <button class="btn btn-primary" on:click={() => reportActions.loadAuditData()}>
-            Load Data
-          </button>
-        </div>
+        <EmptyState
+          icon="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          title="No Audit Data"
+          description="Start tracking time to see your work history here"
+          actionText="Load Data"
+          actionVariant="primary"
+          on:click={() => reportActions.loadAuditData()}
+        />
       {/if}
     </div>
   </div>

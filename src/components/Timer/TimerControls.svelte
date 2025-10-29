@@ -182,7 +182,8 @@
                   class="text-left"
                 >
                   <div
-                    class="w-3 h-3 rounded-full bg-{task.color || 'primary'} flex-shrink-0"
+                    class="w-3 h-3 rounded-full flex-shrink-0"
+                    style="background-color: {task.color || 'hsl(var(--p))'}"
                   ></div>
                   <span class="truncate">{task.name}</span>
                 </button>
@@ -242,7 +243,8 @@
                   class="text-left"
                 >
                   <div
-                    class="w-3 h-3 rounded-full bg-{task.color || 'primary'} flex-shrink-0"
+                    class="w-3 h-3 rounded-full flex-shrink-0"
+                    style="background-color: {task.color || 'hsl(var(--p))'}"
                   ></div>
                   <span class="truncate">{task.name}</span>
                   {#if task.totalTime > 0}
@@ -273,29 +275,6 @@
 
 <style>
   .dropdown-content {
-    z-index: 1000;
-  }
-
-  /* Custom task color indicators */
-  .dropdown-content .bg-primary {
-    background-color: hsl(var(--p));
-  }
-  .dropdown-content .bg-secondary {
-    background-color: hsl(var(--s));
-  }
-  .dropdown-content .bg-accent {
-    background-color: hsl(var(--a));
-  }
-  .dropdown-content .bg-success {
-    background-color: hsl(var(--su));
-  }
-  .dropdown-content .bg-warning {
-    background-color: hsl(var(--wa));
-  }
-  .dropdown-content .bg-error {
-    background-color: hsl(var(--er));
-  }
-  .dropdown-content .bg-info {
-    background-color: hsl(var(--in));
+    z-index: var(--z-dropdown);
   }
 </style>

@@ -68,7 +68,7 @@
             Working on: <span class="font-semibold text-primary">{$timerState.taskName}</span>
           </div>
         {:else}
-          <div class="text-xl text-base-content/50">Ready to start working</div>
+          <div class="text-xl text-base-content/60">Ready to start working</div>
         {/if}
       </div>
 
